@@ -1,0 +1,1 @@
+"""Movie Lab application package."""

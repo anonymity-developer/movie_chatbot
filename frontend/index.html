@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Movie Lab</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">M</span><div><h1>Movie Lab</h1><p>영화 속 궁금증을, 확인할 수 있는 근거와 함께</p></div></div>
+    </header>
+    <main class="layout">
+      <aside class="panel movies" aria-label="영화 선택">
+        <div class="sidebar-heading"><span class="eyebrow">LIBRARY</span><h2>영화 찾기</h2></div>
+        <form id="movie-search-form" class="movie-search-form" role="search">
+          <label for="movie-search">제목으로 검색</label>
+          <div class="movie-search-row"><input id="movie-search" type="search" placeholder="인터스텔라" autocomplete="off" /><button type="submit">검색</button></div>
+        </form>
+        <p id="movie-search-status" class="muted" role="status">제목만 입력해도 검색할 수 있습니다.</p>
+        <details class="advanced-search">
+          <summary>장르·연도 등 조건으로 찾기</summary>
+          <form id="discover-form" class="discover-form">
+            <label for="discover-condition">원하는 조건</label>
+            <input id="discover-condition" type="text" required minlength="2" maxlength="500" placeholder="예: 2014년 이후 한국 SF 영화" />
+            <button id="discover-submit" type="submit">조건 검색</button>
+          </form>
+          <p id="discover-status" class="muted" role="status"></p>
+          <ul id="discover-results" aria-label="조건 탐색 결과"></ul>
+        </details>
+        <hr />
+        <p id="index-status" class="muted" role="status">색인 상태 확인 중…</p>
+        <ul id="movie-list"></ul>
+        <button id="more-movies" type="button" hidden>더 보기</button>
+      </aside>
+      <section class="panel conversation" aria-labelledby="selected-title">
+        <div class="conversation-header">
+          <button id="toggle-library" class="movie-switch" type="button" hidden>← 영화 바꾸기</button>
+          <h2 id="selected-title">영화를 선택하세요</h2>
+          <p id="selected-description" class="muted">영화를 선택하면 질문할 수 있습니다.</p>
+          <button id="guide" type="button" disabled>관람 가이드 만들기</button>
+        </div>
+        <div id="messages" class="messages" aria-live="polite"><div class="empty-state"><span class="empty-icon" aria-hidden="true">✦</span><h3>어떤 영화가 궁금하세요?</h3><p>왼쪽에서 영화를 선택한 뒤 질문해 보세요. 답변에 사용한 자료도 함께 보여드립니다.</p></div></div>
+        <form id="chat-form">
+          <label for="question" class="sr-only">질문</label>
+          <div class="input-row">
+            <input id="question" required maxlength="2000" placeholder="영화에 대해 질문해 보세요" disabled />
+            <button id="send" type="submit" disabled>답변 받기 <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="composer-tools"><button id="collect" type="button" disabled>↻ 새 문서 찾기</button><span>답변에 필요한 자료가 부족할 때, 입력한 질문으로 새 문서를 수집합니다.</span></div>
+        </form>
+        <p id="progress" role="status" class="muted"></p>
+      </section>
+    </main>
+    <footer class="credits">
+      <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg" width="44" height="44" alt="TMDB" /></a>
+      <p>영화 정보 출처: <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer">TMDB</a>. This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.</p>
+      <p>문서 출처: <a href="https://ko.wikipedia.org" target="_blank" rel="noopener noreferrer">한국어 위키백과</a> (CC BY-SA 4.0), <a href="https://www.wikidata.org" target="_blank" rel="noopener noreferrer">Wikidata</a> (CC0). 답변의 개별 근거에서 원문을 확인할 수 있습니다.</p>
+    </footer>
+  </body>
+</html>
