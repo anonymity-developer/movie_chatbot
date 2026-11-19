@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import os
 from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
 
 from app.ai.indexing.chunks import Chunk
+from app.config import openai_options
 
 
 def batches(items: Iterable[Chunk], size: int = 64) -> Iterable[list[Chunk]]:
@@ -22,13 +22,13 @@ def batches(items: Iterable[Chunk], size: int = 64) -> Iterable[list[Chunk]]:
 
 class OpenAIEmbedder:
     def __init__(self, model: str, *, timeout: float | None = None, max_retries: int | None = None):
-        if not os.getenv("OPENAI_API_KEY"):
-            raise RuntimeError("OPENAI_API_KEY is missing")
+        options = openai_options()
+        if not options:
+            raise RuntimeError("GMS_API_KEY or OPENAI_API_KEY is missing")
         try:
             from openai import OpenAI
         except ImportError as exc:
             raise RuntimeError("Install requirements.txt before indexing") from exc
-        options = {}
         if timeout is not None:
             options["timeout"] = timeout
         if max_retries is not None:

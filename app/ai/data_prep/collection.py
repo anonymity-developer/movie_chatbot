@@ -33,7 +33,9 @@ class OpenAIChatModel:
             from openai import OpenAI
         except ImportError as exc:
             raise RuntimeError("Install requirements.txt before collecting documents") from exc
-        self.client = OpenAI()
+        from app.config import openai_options
+
+        self.client = OpenAI(**openai_options())
         self.model = model
 
     def complete_json(self, system: str, user: str) -> dict[str, Any]:

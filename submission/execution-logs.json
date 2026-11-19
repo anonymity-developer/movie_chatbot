@@ -6,10 +6,10 @@
       "replans": 0
     },
     "result": {
-      "run_id": "c643da26-4906-46be-b6ac-074ef9550f99",
+      "run_id": "a9407e37-5cf1-432b-b699-4d5717e7f4cd",
       "mode": "demo",
       "status": "recommended",
-      "answer": "시간 조건에 맞는 후보 2편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "answer": "시간 조건에 맞는 후보 2편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 등록 일정과 겹치지 않는 시간을 계산했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
       "conditions": {
         "date": "2026-11-20",
         "earliest": "15:00:00",
@@ -26,7 +26,8 @@
             "드라마"
           ],
           "required_minutes": 185,
-          "latest_start": "15:55"
+          "latest_start": "15:55",
+          "latest_end": "19:00"
         },
         {
           "movie_id": "90000002",
@@ -37,7 +38,8 @@
             "드라마"
           ],
           "required_minutes": 115,
-          "latest_start": "17:05"
+          "latest_start": "17:05",
+          "latest_end": "19:00"
         }
       ],
       "excluded": [
@@ -89,15 +91,17 @@
       "events": [
         {
           "sequence": 1,
-          "timestamp": "2026-11-19T07:37:44.217917+00:00",
+          "timestamp": "2026-11-19T08:19:51.804279+00:00",
           "event": "run.start",
           "data": {
-            "mode": "demo"
+            "mode": "demo",
+            "worker": true,
+            "worker_llm": false
           }
         },
         {
           "sequence": 2,
-          "timestamp": "2026-11-19T07:37:44.238703+00:00",
+          "timestamp": "2026-11-19T08:19:51.826653+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "analyze"
@@ -105,7 +109,7 @@
         },
         {
           "sequence": 3,
-          "timestamp": "2026-11-19T07:37:44.255249+00:00",
+          "timestamp": "2026-11-19T08:19:51.846793+00:00",
           "event": "analysis.decision",
           "data": {
             "intent": "plan",
@@ -120,7 +124,7 @@
         },
         {
           "sequence": 4,
-          "timestamp": "2026-11-19T07:37:44.268849+00:00",
+          "timestamp": "2026-11-19T08:19:51.854058+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "analyze"
@@ -128,7 +132,7 @@
         },
         {
           "sequence": 5,
-          "timestamp": "2026-11-19T07:37:44.281126+00:00",
+          "timestamp": "2026-11-19T08:19:51.880337+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "plan"
@@ -136,20 +140,21 @@
         },
         {
           "sequence": 6,
-          "timestamp": "2026-11-19T07:37:44.289808+00:00",
+          "timestamp": "2026-11-19T08:19:51.895837+00:00",
           "event": "plan.selected",
           "data": {
             "tools": [
               "box_office",
               "movie_detail",
-              "theaters"
+              "theaters",
+              "calendar_busy"
             ],
             "missing": []
           }
         },
         {
           "sequence": 7,
-          "timestamp": "2026-11-19T07:37:44.307841+00:00",
+          "timestamp": "2026-11-19T08:19:51.913313+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "plan"
@@ -157,7 +162,7 @@
         },
         {
           "sequence": 8,
-          "timestamp": "2026-11-19T07:37:44.318211+00:00",
+          "timestamp": "2026-11-19T08:19:51.918281+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
@@ -165,7 +170,20 @@
         },
         {
           "sequence": 9,
-          "timestamp": "2026-11-19T07:37:44.324488+00:00",
+          "timestamp": "2026-11-19T08:19:51.938469+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T08:19:51.948214+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -176,8 +194,8 @@
           }
         },
         {
-          "sequence": 10,
-          "timestamp": "2026-11-19T07:37:44.343894+00:00",
+          "sequence": 11,
+          "timestamp": "2026-11-19T08:19:51.957929+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -211,8 +229,31 @@
           }
         },
         {
-          "sequence": 11,
-          "timestamp": "2026-11-19T07:37:44.355439+00:00",
+          "sequence": 12,
+          "timestamp": "2026-11-19T08:19:51.973797+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T08:19:51.985335+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T08:19:51.991328+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -222,30 +263,8 @@
           }
         },
         {
-          "sequence": 12,
-          "timestamp": "2026-11-19T07:37:44.373219+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000002"
-            }
-          }
-        },
-        {
-          "sequence": 13,
-          "timestamp": "2026-11-19T07:37:44.383015+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000003"
-            }
-          }
-        },
-        {
-          "sequence": 14,
-          "timestamp": "2026-11-19T07:37:44.384932+00:00",
+          "sequence": 15,
+          "timestamp": "2026-11-19T08:19:52.010710+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -267,8 +286,42 @@
           }
         },
         {
-          "sequence": 15,
-          "timestamp": "2026-11-19T07:37:44.412747+00:00",
+          "sequence": 16,
+          "timestamp": "2026-11-19T08:19:52.022366+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T08:19:52.038318+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T08:19:52.052333+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T08:19:52.052333+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -290,8 +343,42 @@
           }
         },
         {
-          "sequence": 16,
-          "timestamp": "2026-11-19T07:37:44.423659+00:00",
+          "sequence": 20,
+          "timestamp": "2026-11-19T08:19:52.079248+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T08:19:52.087602+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T08:19:52.109600+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T08:19:52.121893+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -309,8 +396,33 @@
           }
         },
         {
-          "sequence": 17,
-          "timestamp": "2026-11-19T07:37:44.432201+00:00",
+          "sequence": 24,
+          "timestamp": "2026-11-19T08:19:52.138743+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": false,
+            "replan": false,
+            "code": "NO_RUNTIME"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T08:19:52.152093+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "editable": [
+              "query_hint"
+            ]
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T08:19:52.156793+00:00",
           "event": "tool.request",
           "data": {
             "tool": "theaters",
@@ -320,8 +432,8 @@
           }
         },
         {
-          "sequence": 18,
-          "timestamp": "2026-11-19T07:37:44.442792+00:00",
+          "sequence": 27,
+          "timestamp": "2026-11-19T08:19:52.168851+00:00",
           "event": "tool.response",
           "data": {
             "tool": "theaters",
@@ -337,31 +449,96 @@
                     "address": "강남",
                     "url": ""
                   }
-                ]
+                ],
+                "source": "demo"
               }
             },
             "elapsed_ms": 0
           }
         },
         {
-          "sequence": 19,
-          "timestamp": "2026-11-19T07:37:44.455344+00:00",
+          "sequence": 28,
+          "timestamp": "2026-11-19T08:19:52.190805+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "theaters",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T08:19:52.211319+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T08:19:52.222602+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T08:19:52.242712+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "source": "local",
+                "busy": []
+              }
+            },
+            "elapsed_ms": 1
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T08:19:52.256900+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "calendar_busy",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T08:19:52.268307+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 20,
-          "timestamp": "2026-11-19T07:37:44.472108+00:00",
+          "sequence": 34,
+          "timestamp": "2026-11-19T08:19:52.276476+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 21,
-          "timestamp": "2026-11-19T07:37:44.483120+00:00",
+          "sequence": 35,
+          "timestamp": "2026-11-19T08:19:52.319150+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 2,
@@ -370,41 +547,70 @@
           }
         },
         {
-          "sequence": 22,
-          "timestamp": "2026-11-19T07:37:44.490507+00:00",
+          "sequence": 36,
+          "timestamp": "2026-11-19T08:19:52.433814+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T08:19:52.475232+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 23,
-          "timestamp": "2026-11-19T07:37:44.507966+00:00",
+          "sequence": 38,
+          "timestamp": "2026-11-19T08:19:52.552710+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 24,
-          "timestamp": "2026-11-19T07:37:44.518371+00:00",
+          "sequence": 39,
+          "timestamp": "2026-11-19T08:19:52.595911+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 25,
-          "timestamp": "2026-11-19T07:37:44.536343+00:00",
+          "sequence": 40,
+          "timestamp": "2026-11-19T08:19:52.719669+00:00",
+          "event": "review.result",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 41,
+          "timestamp": "2026-11-19T08:19:52.752920+00:00",
           "event": "run.end",
           "data": {
             "status": "recommended",
-            "elapsed_ms": 318
+            "elapsed_ms": 962
           }
         }
       ],
       "log_saved": true,
-      "elapsed_ms": 318
+      "elapsed_ms": 962,
+      "evaluation": {
+        "status": "normal",
+        "warnings": []
+      },
+      "model_calls": {
+        "planner": 0,
+        "worker": 0,
+        "logger": 0
+      },
+      "documents": [],
+      "calendar_event": null
     }
   },
   "replan_match": {
@@ -414,10 +620,10 @@
       "replans": 1
     },
     "result": {
-      "run_id": "f2c71cd0-5c37-41ee-a0a7-5ae67ad50eb0",
+      "run_id": "188297d9-467e-48a4-b0c9-bad5914c2557",
       "mode": "demo",
       "status": "recommended",
-      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 등록 일정과 겹치지 않는 시간을 계산했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
       "conditions": {
         "date": "2026-11-20",
         "earliest": "15:00:00",
@@ -434,7 +640,8 @@
             "드라마"
           ],
           "required_minutes": 87,
-          "latest_start": "15:13"
+          "latest_start": "15:13",
+          "latest_end": "16:40"
         }
       ],
       "excluded": [
@@ -451,7 +658,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 185분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000002",
@@ -461,7 +668,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 115분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 115분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         }
       ],
       "theaters": [
@@ -523,15 +730,17 @@
       "events": [
         {
           "sequence": 1,
-          "timestamp": "2026-11-19T07:37:44.557920+00:00",
+          "timestamp": "2026-11-19T08:19:52.884420+00:00",
           "event": "run.start",
           "data": {
-            "mode": "demo"
+            "mode": "demo",
+            "worker": true,
+            "worker_llm": false
           }
         },
         {
           "sequence": 2,
-          "timestamp": "2026-11-19T07:37:44.574079+00:00",
+          "timestamp": "2026-11-19T08:19:52.978267+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "analyze"
@@ -539,7 +748,7 @@
         },
         {
           "sequence": 3,
-          "timestamp": "2026-11-19T07:37:44.584790+00:00",
+          "timestamp": "2026-11-19T08:19:53.027059+00:00",
           "event": "analysis.decision",
           "data": {
             "intent": "plan",
@@ -554,7 +763,7 @@
         },
         {
           "sequence": 4,
-          "timestamp": "2026-11-19T07:37:44.601160+00:00",
+          "timestamp": "2026-11-19T08:19:53.073138+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "analyze"
@@ -562,7 +771,7 @@
         },
         {
           "sequence": 5,
-          "timestamp": "2026-11-19T07:37:44.610744+00:00",
+          "timestamp": "2026-11-19T08:19:53.181817+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "plan"
@@ -570,20 +779,21 @@
         },
         {
           "sequence": 6,
-          "timestamp": "2026-11-19T07:37:44.618483+00:00",
+          "timestamp": "2026-11-19T08:19:53.238235+00:00",
           "event": "plan.selected",
           "data": {
             "tools": [
               "box_office",
               "movie_detail",
-              "theaters"
+              "theaters",
+              "calendar_busy"
             ],
             "missing": []
           }
         },
         {
           "sequence": 7,
-          "timestamp": "2026-11-19T07:37:44.618483+00:00",
+          "timestamp": "2026-11-19T08:19:53.310862+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "plan"
@@ -591,7 +801,7 @@
         },
         {
           "sequence": 8,
-          "timestamp": "2026-11-19T07:37:44.644232+00:00",
+          "timestamp": "2026-11-19T08:19:53.385734+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
@@ -599,7 +809,20 @@
         },
         {
           "sequence": 9,
-          "timestamp": "2026-11-19T07:37:44.651783+00:00",
+          "timestamp": "2026-11-19T08:19:53.436798+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T08:19:53.482470+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -610,8 +833,8 @@
           }
         },
         {
-          "sequence": 10,
-          "timestamp": "2026-11-19T07:37:44.656671+00:00",
+          "sequence": 11,
+          "timestamp": "2026-11-19T08:19:53.587057+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -645,8 +868,31 @@
           }
         },
         {
-          "sequence": 11,
-          "timestamp": "2026-11-19T07:37:44.675278+00:00",
+          "sequence": 12,
+          "timestamp": "2026-11-19T08:19:53.630462+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T08:19:53.687211+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T08:19:53.741805+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -656,30 +902,8 @@
           }
         },
         {
-          "sequence": 12,
-          "timestamp": "2026-11-19T07:37:44.685306+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000002"
-            }
-          }
-        },
-        {
-          "sequence": 13,
-          "timestamp": "2026-11-19T07:37:44.685306+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000003"
-            }
-          }
-        },
-        {
-          "sequence": 14,
-          "timestamp": "2026-11-19T07:37:44.708926+00:00",
+          "sequence": 15,
+          "timestamp": "2026-11-19T08:19:53.805835+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -701,8 +925,42 @@
           }
         },
         {
-          "sequence": 15,
-          "timestamp": "2026-11-19T07:37:44.718874+00:00",
+          "sequence": 16,
+          "timestamp": "2026-11-19T08:19:53.847975+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T08:19:53.882840+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T08:19:53.924432+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T08:19:53.953535+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -724,8 +982,42 @@
           }
         },
         {
-          "sequence": 16,
-          "timestamp": "2026-11-19T07:37:44.731993+00:00",
+          "sequence": 20,
+          "timestamp": "2026-11-19T08:19:54.004689+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T08:19:54.049989+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T08:19:54.122782+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T08:19:54.182732+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -743,8 +1035,33 @@
           }
         },
         {
-          "sequence": 17,
-          "timestamp": "2026-11-19T07:37:44.743117+00:00",
+          "sequence": 24,
+          "timestamp": "2026-11-19T08:19:54.220940+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": false,
+            "replan": false,
+            "code": "NO_RUNTIME"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T08:19:54.257620+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "editable": [
+              "query_hint"
+            ]
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T08:19:54.305193+00:00",
           "event": "tool.request",
           "data": {
             "tool": "theaters",
@@ -754,8 +1071,8 @@
           }
         },
         {
-          "sequence": 18,
-          "timestamp": "2026-11-19T07:37:44.755570+00:00",
+          "sequence": 27,
+          "timestamp": "2026-11-19T08:19:54.347527+00:00",
           "event": "tool.response",
           "data": {
             "tool": "theaters",
@@ -771,31 +1088,96 @@
                     "address": "강남",
                     "url": ""
                   }
-                ]
+                ],
+                "source": "demo"
               }
             },
             "elapsed_ms": 0
           }
         },
         {
-          "sequence": 19,
-          "timestamp": "2026-11-19T07:37:44.755570+00:00",
+          "sequence": 28,
+          "timestamp": "2026-11-19T08:19:54.389672+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "theaters",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T08:19:54.476498+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T08:19:54.519188+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T08:19:54.554495+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "source": "local",
+                "busy": []
+              }
+            },
+            "elapsed_ms": 2
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T08:19:54.599778+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "calendar_busy",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T08:19:54.639368+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 20,
-          "timestamp": "2026-11-19T07:37:44.778363+00:00",
+          "sequence": 34,
+          "timestamp": "2026-11-19T08:19:54.679752+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 21,
-          "timestamp": "2026-11-19T07:37:44.785369+00:00",
+          "sequence": 35,
+          "timestamp": "2026-11-19T08:19:54.721300+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 0,
@@ -804,24 +1186,33 @@
           }
         },
         {
-          "sequence": 22,
-          "timestamp": "2026-11-19T07:37:44.800085+00:00",
+          "sequence": 36,
+          "timestamp": "2026-11-19T08:19:54.762134+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T08:19:54.804046+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 23,
-          "timestamp": "2026-11-19T07:37:44.810621+00:00",
+          "sequence": 38,
+          "timestamp": "2026-11-19T08:19:54.844814+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 24,
-          "timestamp": "2026-11-19T07:37:44.818652+00:00",
+          "sequence": 39,
+          "timestamp": "2026-11-19T08:19:54.888168+00:00",
           "event": "replan",
           "data": {
             "attempt": 1,
@@ -833,24 +1224,36 @@
           }
         },
         {
-          "sequence": 25,
-          "timestamp": "2026-11-19T07:37:44.834813+00:00",
+          "sequence": 40,
+          "timestamp": "2026-11-19T08:19:54.936288+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 26,
-          "timestamp": "2026-11-19T07:37:44.847192+00:00",
+          "sequence": 41,
+          "timestamp": "2026-11-19T08:19:54.982986+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 27,
-          "timestamp": "2026-11-19T07:37:44.855854+00:00",
+          "sequence": 42,
+          "timestamp": "2026-11-19T08:19:55.020709+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 43,
+          "timestamp": "2026-11-19T08:19:55.054498+00:00",
           "event": "tool.request",
           "data": {
             "tool": "weekly_box_office",
@@ -860,8 +1263,8 @@
           }
         },
         {
-          "sequence": 28,
-          "timestamp": "2026-11-19T07:37:44.869590+00:00",
+          "sequence": 44,
+          "timestamp": "2026-11-19T08:19:55.087961+00:00",
           "event": "tool.response",
           "data": {
             "tool": "weekly_box_office",
@@ -890,8 +1293,31 @@
           }
         },
         {
-          "sequence": 29,
-          "timestamp": "2026-11-19T07:37:44.879644+00:00",
+          "sequence": 45,
+          "timestamp": "2026-11-19T08:19:55.144496+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "weekly_box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 46,
+          "timestamp": "2026-11-19T08:19:55.183576+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 47,
+          "timestamp": "2026-11-19T08:19:55.222992+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -901,8 +1327,8 @@
           }
         },
         {
-          "sequence": 30,
-          "timestamp": "2026-11-19T07:37:44.890294+00:00",
+          "sequence": 48,
+          "timestamp": "2026-11-19T08:19:55.255080+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -924,24 +1350,35 @@
           }
         },
         {
-          "sequence": 31,
-          "timestamp": "2026-11-19T07:37:44.900926+00:00",
+          "sequence": 49,
+          "timestamp": "2026-11-19T08:19:55.308842+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 50,
+          "timestamp": "2026-11-19T08:19:55.346842+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 32,
-          "timestamp": "2026-11-19T07:37:44.910731+00:00",
+          "sequence": 51,
+          "timestamp": "2026-11-19T08:19:55.388221+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 33,
-          "timestamp": "2026-11-19T07:37:44.918551+00:00",
+          "sequence": 52,
+          "timestamp": "2026-11-19T08:19:55.440860+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 1,
@@ -950,41 +1387,70 @@
           }
         },
         {
-          "sequence": 34,
-          "timestamp": "2026-11-19T07:37:44.918551+00:00",
+          "sequence": 53,
+          "timestamp": "2026-11-19T08:19:55.482083+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 54,
+          "timestamp": "2026-11-19T08:19:55.521285+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 35,
-          "timestamp": "2026-11-19T07:37:44.942280+00:00",
+          "sequence": 55,
+          "timestamp": "2026-11-19T08:19:55.556785+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 36,
-          "timestamp": "2026-11-19T07:37:44.952235+00:00",
+          "sequence": 56,
+          "timestamp": "2026-11-19T08:19:55.606303+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 37,
-          "timestamp": "2026-11-19T07:37:44.974839+00:00",
+          "sequence": 57,
+          "timestamp": "2026-11-19T08:19:55.704952+00:00",
+          "event": "review.result",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 58,
+          "timestamp": "2026-11-19T08:19:55.755130+00:00",
           "event": "run.end",
           "data": {
             "status": "recommended",
-            "elapsed_ms": 417
+            "elapsed_ms": 2873
           }
         }
       ],
       "log_saved": true,
-      "elapsed_ms": 417
+      "elapsed_ms": 2873,
+      "evaluation": {
+        "status": "normal",
+        "warnings": []
+      },
+      "model_calls": {
+        "planner": 0,
+        "worker": 0,
+        "logger": 0
+      },
+      "documents": [],
+      "calendar_event": null
     }
   },
   "replan_limit": {
@@ -994,7 +1460,7 @@
       "replans": 3
     },
     "result": {
-      "run_id": "bbed4da8-a3d9-4808-be89-1ea65960fa4c",
+      "run_id": "ef5c1312-17bd-4d6d-8830-918f400cad8c",
       "mode": "demo",
       "status": "no_match",
       "answer": "재계획 3회 후에도 시간 조건에 맞는 영화를 찾지 못했습니다. 시작 가능 시각이나 종료 마감 시각을 조정해 주세요.",
@@ -1019,7 +1485,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 185분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000002",
@@ -1029,7 +1495,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 115분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 115분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000004",
@@ -1039,7 +1505,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 87분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 87분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000005",
@@ -1049,7 +1515,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 120분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 120분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000006",
@@ -1059,7 +1525,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 125분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 125분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000007",
@@ -1069,7 +1535,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 130분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 130분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         },
         {
           "movie_id": "90000008",
@@ -1079,7 +1545,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 135분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 135분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         }
       ],
       "theaters": [
@@ -1175,15 +1641,17 @@
       "events": [
         {
           "sequence": 1,
-          "timestamp": "2026-11-19T07:37:44.994926+00:00",
+          "timestamp": "2026-11-19T08:19:55.837097+00:00",
           "event": "run.start",
           "data": {
-            "mode": "demo"
+            "mode": "demo",
+            "worker": true,
+            "worker_llm": false
           }
         },
         {
           "sequence": 2,
-          "timestamp": "2026-11-19T07:37:45.014966+00:00",
+          "timestamp": "2026-11-19T08:19:55.896840+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "analyze"
@@ -1191,7 +1659,7 @@
         },
         {
           "sequence": 3,
-          "timestamp": "2026-11-19T07:37:45.018572+00:00",
+          "timestamp": "2026-11-19T08:19:55.945813+00:00",
           "event": "analysis.decision",
           "data": {
             "intent": "plan",
@@ -1206,7 +1674,7 @@
         },
         {
           "sequence": 4,
-          "timestamp": "2026-11-19T07:37:45.035023+00:00",
+          "timestamp": "2026-11-19T08:19:55.988771+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "analyze"
@@ -1214,7 +1682,7 @@
         },
         {
           "sequence": 5,
-          "timestamp": "2026-11-19T07:37:45.044749+00:00",
+          "timestamp": "2026-11-19T08:19:56.038046+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "plan"
@@ -1222,20 +1690,21 @@
         },
         {
           "sequence": 6,
-          "timestamp": "2026-11-19T07:37:45.053258+00:00",
+          "timestamp": "2026-11-19T08:19:56.084290+00:00",
           "event": "plan.selected",
           "data": {
             "tools": [
               "box_office",
               "movie_detail",
-              "theaters"
+              "theaters",
+              "calendar_busy"
             ],
             "missing": []
           }
         },
         {
           "sequence": 7,
-          "timestamp": "2026-11-19T07:37:45.068408+00:00",
+          "timestamp": "2026-11-19T08:19:56.138129+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "plan"
@@ -1243,7 +1712,7 @@
         },
         {
           "sequence": 8,
-          "timestamp": "2026-11-19T07:37:45.081718+00:00",
+          "timestamp": "2026-11-19T08:19:56.179307+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
@@ -1251,7 +1720,20 @@
         },
         {
           "sequence": 9,
-          "timestamp": "2026-11-19T07:37:45.085340+00:00",
+          "timestamp": "2026-11-19T08:19:56.230098+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T08:19:56.272996+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -1262,8 +1744,8 @@
           }
         },
         {
-          "sequence": 10,
-          "timestamp": "2026-11-19T07:37:45.103242+00:00",
+          "sequence": 11,
+          "timestamp": "2026-11-19T08:19:56.310835+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -1297,8 +1779,31 @@
           }
         },
         {
-          "sequence": 11,
-          "timestamp": "2026-11-19T07:37:45.114876+00:00",
+          "sequence": 12,
+          "timestamp": "2026-11-19T08:19:56.339784+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T08:19:56.370702+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T08:19:56.413383+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -1308,30 +1813,8 @@
           }
         },
         {
-          "sequence": 12,
-          "timestamp": "2026-11-19T07:37:45.120599+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000002"
-            }
-          }
-        },
-        {
-          "sequence": 13,
-          "timestamp": "2026-11-19T07:37:45.135626+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000003"
-            }
-          }
-        },
-        {
-          "sequence": 14,
-          "timestamp": "2026-11-19T07:37:45.146739+00:00",
+          "sequence": 15,
+          "timestamp": "2026-11-19T08:19:56.452351+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1353,8 +1836,42 @@
           }
         },
         {
-          "sequence": 15,
-          "timestamp": "2026-11-19T07:37:45.156343+00:00",
+          "sequence": 16,
+          "timestamp": "2026-11-19T08:19:56.484821+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T08:19:56.522698+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T08:19:56.556011+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T08:19:56.606808+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1376,8 +1893,42 @@
           }
         },
         {
-          "sequence": 16,
-          "timestamp": "2026-11-19T07:37:45.170477+00:00",
+          "sequence": 20,
+          "timestamp": "2026-11-19T08:19:56.644884+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T08:19:56.685313+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T08:19:56.716995+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T08:19:56.756230+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1395,8 +1946,33 @@
           }
         },
         {
-          "sequence": 17,
-          "timestamp": "2026-11-19T07:37:45.183580+00:00",
+          "sequence": 24,
+          "timestamp": "2026-11-19T08:19:56.795029+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": false,
+            "replan": false,
+            "code": "NO_RUNTIME"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T08:19:56.822606+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "editable": [
+              "query_hint"
+            ]
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T08:19:56.873546+00:00",
           "event": "tool.request",
           "data": {
             "tool": "theaters",
@@ -1406,8 +1982,8 @@
           }
         },
         {
-          "sequence": 18,
-          "timestamp": "2026-11-19T07:37:45.193156+00:00",
+          "sequence": 27,
+          "timestamp": "2026-11-19T08:19:56.914010+00:00",
           "event": "tool.response",
           "data": {
             "tool": "theaters",
@@ -1423,31 +1999,96 @@
                     "address": "강남",
                     "url": ""
                   }
-                ]
+                ],
+                "source": "demo"
               }
             },
             "elapsed_ms": 0
           }
         },
         {
-          "sequence": 19,
-          "timestamp": "2026-11-19T07:37:45.210964+00:00",
+          "sequence": 28,
+          "timestamp": "2026-11-19T08:19:56.956445+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "theaters",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T08:19:57.005361+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T08:19:57.045334+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T08:19:57.082171+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "source": "local",
+                "busy": []
+              }
+            },
+            "elapsed_ms": 2
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T08:19:57.123835+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "calendar_busy",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T08:19:57.162695+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 20,
-          "timestamp": "2026-11-19T07:37:45.219450+00:00",
+          "sequence": 34,
+          "timestamp": "2026-11-19T08:19:57.208675+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 21,
-          "timestamp": "2026-11-19T07:37:45.219450+00:00",
+          "sequence": 35,
+          "timestamp": "2026-11-19T08:19:57.250342+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 0,
@@ -1456,24 +2097,33 @@
           }
         },
         {
-          "sequence": 22,
-          "timestamp": "2026-11-19T07:37:45.241295+00:00",
+          "sequence": 36,
+          "timestamp": "2026-11-19T08:19:57.290139+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T08:19:57.325728+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 23,
-          "timestamp": "2026-11-19T07:37:45.252145+00:00",
+          "sequence": 38,
+          "timestamp": "2026-11-19T08:19:57.373294+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 24,
-          "timestamp": "2026-11-19T07:37:45.259728+00:00",
+          "sequence": 39,
+          "timestamp": "2026-11-19T08:19:57.411399+00:00",
           "event": "replan",
           "data": {
             "attempt": 1,
@@ -1485,24 +2135,36 @@
           }
         },
         {
-          "sequence": 25,
-          "timestamp": "2026-11-19T07:37:45.272653+00:00",
+          "sequence": 40,
+          "timestamp": "2026-11-19T08:19:57.448792+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 26,
-          "timestamp": "2026-11-19T07:37:45.286152+00:00",
+          "sequence": 41,
+          "timestamp": "2026-11-19T08:19:57.497601+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 27,
-          "timestamp": "2026-11-19T07:37:45.300982+00:00",
+          "sequence": 42,
+          "timestamp": "2026-11-19T08:19:57.543579+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 43,
+          "timestamp": "2026-11-19T08:19:57.575873+00:00",
           "event": "tool.request",
           "data": {
             "tool": "weekly_box_office",
@@ -1512,8 +2174,8 @@
           }
         },
         {
-          "sequence": 28,
-          "timestamp": "2026-11-19T07:37:45.310507+00:00",
+          "sequence": 44,
+          "timestamp": "2026-11-19T08:19:57.622690+00:00",
           "event": "tool.response",
           "data": {
             "tool": "weekly_box_office",
@@ -1542,8 +2204,31 @@
           }
         },
         {
-          "sequence": 29,
-          "timestamp": "2026-11-19T07:37:45.318866+00:00",
+          "sequence": 45,
+          "timestamp": "2026-11-19T08:19:57.678902+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "weekly_box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 46,
+          "timestamp": "2026-11-19T08:19:57.722191+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 47,
+          "timestamp": "2026-11-19T08:19:57.783464+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -1553,8 +2238,8 @@
           }
         },
         {
-          "sequence": 30,
-          "timestamp": "2026-11-19T07:37:45.318866+00:00",
+          "sequence": 48,
+          "timestamp": "2026-11-19T08:19:57.823377+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1576,24 +2261,35 @@
           }
         },
         {
-          "sequence": 31,
-          "timestamp": "2026-11-19T07:37:45.344666+00:00",
+          "sequence": 49,
+          "timestamp": "2026-11-19T08:19:57.890339+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 50,
+          "timestamp": "2026-11-19T08:19:57.948989+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 32,
-          "timestamp": "2026-11-19T07:37:45.352328+00:00",
+          "sequence": 51,
+          "timestamp": "2026-11-19T08:19:57.989406+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 33,
-          "timestamp": "2026-11-19T07:37:45.356834+00:00",
+          "sequence": 52,
+          "timestamp": "2026-11-19T08:19:58.031133+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 0,
@@ -1602,24 +2298,33 @@
           }
         },
         {
-          "sequence": 34,
-          "timestamp": "2026-11-19T07:37:45.377276+00:00",
+          "sequence": 53,
+          "timestamp": "2026-11-19T08:19:58.071284+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 54,
+          "timestamp": "2026-11-19T08:19:58.115779+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 35,
-          "timestamp": "2026-11-19T07:37:45.387506+00:00",
+          "sequence": 55,
+          "timestamp": "2026-11-19T08:19:58.157338+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 36,
-          "timestamp": "2026-11-19T07:37:45.387506+00:00",
+          "sequence": 56,
+          "timestamp": "2026-11-19T08:19:58.199684+00:00",
           "event": "replan",
           "data": {
             "attempt": 2,
@@ -1631,24 +2336,37 @@
           }
         },
         {
-          "sequence": 37,
-          "timestamp": "2026-11-19T07:37:45.408790+00:00",
+          "sequence": 57,
+          "timestamp": "2026-11-19T08:19:58.230272+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 38,
-          "timestamp": "2026-11-19T07:37:45.419027+00:00",
+          "sequence": 58,
+          "timestamp": "2026-11-19T08:19:58.273115+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 39,
-          "timestamp": "2026-11-19T07:37:45.421222+00:00",
+          "sequence": 59,
+          "timestamp": "2026-11-19T08:19:58.314018+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 2
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 60,
+          "timestamp": "2026-11-19T08:19:58.356916+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -1659,8 +2377,8 @@
           }
         },
         {
-          "sequence": 40,
-          "timestamp": "2026-11-19T07:37:45.440799+00:00",
+          "sequence": 61,
+          "timestamp": "2026-11-19T08:19:58.411296+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -1690,8 +2408,31 @@
           }
         },
         {
-          "sequence": 41,
-          "timestamp": "2026-11-19T07:37:45.452668+00:00",
+          "sequence": 62,
+          "timestamp": "2026-11-19T08:19:58.460314+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 63,
+          "timestamp": "2026-11-19T08:19:58.480301+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000005"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 64,
+          "timestamp": "2026-11-19T08:19:58.492950+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -1701,19 +2442,8 @@
           }
         },
         {
-          "sequence": 42,
-          "timestamp": "2026-11-19T07:37:45.456936+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000006"
-            }
-          }
-        },
-        {
-          "sequence": 43,
-          "timestamp": "2026-11-19T07:37:45.475363+00:00",
+          "sequence": 65,
+          "timestamp": "2026-11-19T08:19:58.494846+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1735,8 +2465,42 @@
           }
         },
         {
-          "sequence": 44,
-          "timestamp": "2026-11-19T07:37:45.487083+00:00",
+          "sequence": 66,
+          "timestamp": "2026-11-19T08:19:58.518626+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 67,
+          "timestamp": "2026-11-19T08:19:58.528727+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000006"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 68,
+          "timestamp": "2026-11-19T08:19:58.541189+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000006"
+            }
+          }
+        },
+        {
+          "sequence": 69,
+          "timestamp": "2026-11-19T08:19:58.546465+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1758,24 +2522,35 @@
           }
         },
         {
-          "sequence": 45,
-          "timestamp": "2026-11-19T07:37:45.498156+00:00",
+          "sequence": 70,
+          "timestamp": "2026-11-19T08:19:58.560498+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 71,
+          "timestamp": "2026-11-19T08:19:58.573412+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 46,
-          "timestamp": "2026-11-19T07:37:45.507911+00:00",
+          "sequence": 72,
+          "timestamp": "2026-11-19T08:19:58.590502+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 47,
-          "timestamp": "2026-11-19T07:37:45.519034+00:00",
+          "sequence": 73,
+          "timestamp": "2026-11-19T08:19:58.593658+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 0,
@@ -1784,24 +2559,33 @@
           }
         },
         {
-          "sequence": 48,
-          "timestamp": "2026-11-19T07:37:45.530306+00:00",
+          "sequence": 74,
+          "timestamp": "2026-11-19T08:19:58.614292+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 75,
+          "timestamp": "2026-11-19T08:19:58.624209+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 49,
-          "timestamp": "2026-11-19T07:37:45.540505+00:00",
+          "sequence": 76,
+          "timestamp": "2026-11-19T08:19:58.626054+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 50,
-          "timestamp": "2026-11-19T07:37:45.550523+00:00",
+          "sequence": 77,
+          "timestamp": "2026-11-19T08:19:58.648491+00:00",
           "event": "replan",
           "data": {
             "attempt": 3,
@@ -1813,24 +2597,37 @@
           }
         },
         {
-          "sequence": 51,
-          "timestamp": "2026-11-19T07:37:45.559030+00:00",
+          "sequence": 78,
+          "timestamp": "2026-11-19T08:19:58.658995+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "replan"
           }
         },
         {
-          "sequence": 52,
-          "timestamp": "2026-11-19T07:37:45.571477+00:00",
+          "sequence": 79,
+          "timestamp": "2026-11-19T08:19:58.672534+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 53,
-          "timestamp": "2026-11-19T07:37:45.574717+00:00",
+          "sequence": 80,
+          "timestamp": "2026-11-19T08:19:58.685253+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 3
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 81,
+          "timestamp": "2026-11-19T08:19:58.692399+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -1841,8 +2638,8 @@
           }
         },
         {
-          "sequence": 54,
-          "timestamp": "2026-11-19T07:37:45.589778+00:00",
+          "sequence": 82,
+          "timestamp": "2026-11-19T08:19:58.708256+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -1872,8 +2669,31 @@
           }
         },
         {
-          "sequence": 55,
-          "timestamp": "2026-11-19T07:37:45.602088+00:00",
+          "sequence": 83,
+          "timestamp": "2026-11-19T08:19:58.719337+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 84,
+          "timestamp": "2026-11-19T08:19:58.723763+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000007"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 85,
+          "timestamp": "2026-11-19T08:19:58.740596+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -1883,19 +2703,8 @@
           }
         },
         {
-          "sequence": 56,
-          "timestamp": "2026-11-19T07:37:45.612768+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000008"
-            }
-          }
-        },
-        {
-          "sequence": 57,
-          "timestamp": "2026-11-19T07:37:45.619150+00:00",
+          "sequence": 86,
+          "timestamp": "2026-11-19T08:19:58.754861+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1917,8 +2726,42 @@
           }
         },
         {
-          "sequence": 58,
-          "timestamp": "2026-11-19T07:37:45.636710+00:00",
+          "sequence": 87,
+          "timestamp": "2026-11-19T08:19:58.757792+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 88,
+          "timestamp": "2026-11-19T08:19:58.780902+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000008"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 89,
+          "timestamp": "2026-11-19T08:19:58.792703+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000008"
+            }
+          }
+        },
+        {
+          "sequence": 90,
+          "timestamp": "2026-11-19T08:19:58.792703+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -1940,24 +2783,35 @@
           }
         },
         {
-          "sequence": 59,
-          "timestamp": "2026-11-19T07:37:45.651289+00:00",
+          "sequence": 91,
+          "timestamp": "2026-11-19T08:19:58.812573+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 92,
+          "timestamp": "2026-11-19T08:19:58.823888+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 60,
-          "timestamp": "2026-11-19T07:37:45.657113+00:00",
+          "sequence": 93,
+          "timestamp": "2026-11-19T08:19:58.840179+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 61,
-          "timestamp": "2026-11-19T07:37:45.674195+00:00",
+          "sequence": 94,
+          "timestamp": "2026-11-19T08:19:58.852459+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 0,
@@ -1966,41 +2820,70 @@
           }
         },
         {
-          "sequence": 62,
-          "timestamp": "2026-11-19T07:37:45.683190+00:00",
+          "sequence": 95,
+          "timestamp": "2026-11-19T08:19:58.860952+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 96,
+          "timestamp": "2026-11-19T08:19:58.873628+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 63,
-          "timestamp": "2026-11-19T07:37:45.685970+00:00",
+          "sequence": 97,
+          "timestamp": "2026-11-19T08:19:58.884921+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 64,
-          "timestamp": "2026-11-19T07:37:45.702941+00:00",
+          "sequence": 98,
+          "timestamp": "2026-11-19T08:19:58.892845+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 65,
-          "timestamp": "2026-11-19T07:37:45.720095+00:00",
+          "sequence": 99,
+          "timestamp": "2026-11-19T08:19:58.918767+00:00",
+          "event": "review.result",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 100,
+          "timestamp": "2026-11-19T08:19:58.923924+00:00",
           "event": "run.end",
           "data": {
             "status": "no_match",
-            "elapsed_ms": 729
+            "elapsed_ms": 3091
           }
         }
       ],
       "log_saved": true,
-      "elapsed_ms": 729
+      "elapsed_ms": 3091,
+      "evaluation": {
+        "status": "normal",
+        "warnings": []
+      },
+      "model_calls": {
+        "planner": 0,
+        "worker": 0,
+        "logger": 0
+      },
+      "documents": [],
+      "calendar_event": null
     }
   },
   "detail_failure": {
@@ -2010,10 +2893,10 @@
       "replans": 0
     },
     "result": {
-      "run_id": "f2529cf5-b540-40a5-8f7c-c0685dcdb385",
+      "run_id": "fcfaab2f-3ac5-44b3-891e-c6246cc95e41",
       "mode": "demo",
       "status": "recommended",
-      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 등록 일정과 겹치지 않는 시간을 계산했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
       "conditions": {
         "date": "2026-11-20",
         "earliest": "14:00:00",
@@ -2030,7 +2913,8 @@
             "드라마"
           ],
           "required_minutes": 115,
-          "latest_start": "15:05"
+          "latest_start": "15:05",
+          "latest_end": "17:00"
         }
       ],
       "excluded": [
@@ -2047,7 +2931,7 @@
           "genres": [
             "드라마"
           ],
-          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+          "reason": "입장 여유를 포함해 185분이 필요하며 이용 가능한 연속 시간이 부족합니다."
         }
       ],
       "theaters": [
@@ -2092,15 +2976,17 @@
       "events": [
         {
           "sequence": 1,
-          "timestamp": "2026-11-19T07:37:45.752338+00:00",
+          "timestamp": "2026-11-19T08:19:58.960391+00:00",
           "event": "run.start",
           "data": {
-            "mode": "demo"
+            "mode": "demo",
+            "worker": true,
+            "worker_llm": false
           }
         },
         {
           "sequence": 2,
-          "timestamp": "2026-11-19T07:37:45.768240+00:00",
+          "timestamp": "2026-11-19T08:19:58.974883+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "analyze"
@@ -2108,7 +2994,7 @@
         },
         {
           "sequence": 3,
-          "timestamp": "2026-11-19T07:37:45.769651+00:00",
+          "timestamp": "2026-11-19T08:19:58.986379+00:00",
           "event": "analysis.decision",
           "data": {
             "intent": "plan",
@@ -2123,7 +3009,7 @@
         },
         {
           "sequence": 4,
-          "timestamp": "2026-11-19T07:37:45.788702+00:00",
+          "timestamp": "2026-11-19T08:19:58.993163+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "analyze"
@@ -2131,7 +3017,7 @@
         },
         {
           "sequence": 5,
-          "timestamp": "2026-11-19T07:37:45.802146+00:00",
+          "timestamp": "2026-11-19T08:19:59.008300+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "plan"
@@ -2139,20 +3025,21 @@
         },
         {
           "sequence": 6,
-          "timestamp": "2026-11-19T07:37:45.806642+00:00",
+          "timestamp": "2026-11-19T08:19:59.018304+00:00",
           "event": "plan.selected",
           "data": {
             "tools": [
               "box_office",
               "movie_detail",
-              "theaters"
+              "theaters",
+              "calendar_busy"
             ],
             "missing": []
           }
         },
         {
           "sequence": 7,
-          "timestamp": "2026-11-19T07:37:45.819013+00:00",
+          "timestamp": "2026-11-19T08:19:59.027248+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "plan"
@@ -2160,7 +3047,7 @@
         },
         {
           "sequence": 8,
-          "timestamp": "2026-11-19T07:37:45.819013+00:00",
+          "timestamp": "2026-11-19T08:19:59.041634+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "execute"
@@ -2168,7 +3055,20 @@
         },
         {
           "sequence": 9,
-          "timestamp": "2026-11-19T07:37:45.845018+00:00",
+          "timestamp": "2026-11-19T08:19:59.051684+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T08:19:59.060507+00:00",
           "event": "tool.request",
           "data": {
             "tool": "box_office",
@@ -2179,8 +3079,8 @@
           }
         },
         {
-          "sequence": 10,
-          "timestamp": "2026-11-19T07:37:45.853209+00:00",
+          "sequence": 11,
+          "timestamp": "2026-11-19T08:19:59.073828+00:00",
           "event": "tool.response",
           "data": {
             "tool": "box_office",
@@ -2214,8 +3114,31 @@
           }
         },
         {
-          "sequence": 11,
-          "timestamp": "2026-11-19T07:37:45.867652+00:00",
+          "sequence": 12,
+          "timestamp": "2026-11-19T08:19:59.085575+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "box_office",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T08:19:59.093681+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T08:19:59.106396+00:00",
           "event": "tool.request",
           "data": {
             "tool": "movie_detail",
@@ -2225,30 +3148,8 @@
           }
         },
         {
-          "sequence": 12,
-          "timestamp": "2026-11-19T07:37:45.869214+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000002"
-            }
-          }
-        },
-        {
-          "sequence": 13,
-          "timestamp": "2026-11-19T07:37:45.886125+00:00",
-          "event": "tool.request",
-          "data": {
-            "tool": "movie_detail",
-            "arguments": {
-              "movie_id": "90000003"
-            }
-          }
-        },
-        {
-          "sequence": 14,
-          "timestamp": "2026-11-19T07:37:45.886125+00:00",
+          "sequence": 15,
+          "timestamp": "2026-11-19T08:19:59.115027+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -2270,8 +3171,42 @@
           }
         },
         {
-          "sequence": 15,
-          "timestamp": "2026-11-19T07:37:45.902762+00:00",
+          "sequence": 16,
+          "timestamp": "2026-11-19T08:19:59.126278+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T08:19:59.134782+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T08:19:59.147213+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T08:19:59.156823+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -2293,8 +3228,42 @@
           }
         },
         {
-          "sequence": 16,
-          "timestamp": "2026-11-19T07:37:45.919917+00:00",
+          "sequence": 20,
+          "timestamp": "2026-11-19T08:19:59.165852+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T08:19:59.176629+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T08:19:59.186063+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T08:19:59.193118+00:00",
           "event": "tool.response",
           "data": {
             "tool": "movie_detail",
@@ -2312,8 +3281,33 @@
           }
         },
         {
-          "sequence": 17,
-          "timestamp": "2026-11-19T07:37:45.935814+00:00",
+          "sequence": 24,
+          "timestamp": "2026-11-19T08:19:59.208499+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "movie_detail",
+            "ok": false,
+            "replan": false,
+            "code": "NO_RUNTIME"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T08:19:59.217861+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "홍대"
+            },
+            "editable": [
+              "query_hint"
+            ]
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T08:19:59.224961+00:00",
           "event": "tool.request",
           "data": {
             "tool": "theaters",
@@ -2323,8 +3317,8 @@
           }
         },
         {
-          "sequence": 18,
-          "timestamp": "2026-11-19T07:37:45.951439+00:00",
+          "sequence": 27,
+          "timestamp": "2026-11-19T08:19:59.242819+00:00",
           "event": "tool.response",
           "data": {
             "tool": "theaters",
@@ -2340,31 +3334,96 @@
                     "address": "홍대",
                     "url": ""
                   }
-                ]
+                ],
+                "source": "demo"
               }
             },
             "elapsed_ms": 0
           }
         },
         {
-          "sequence": 19,
-          "timestamp": "2026-11-19T07:37:45.958422+00:00",
+          "sequence": 28,
+          "timestamp": "2026-11-19T08:19:59.256548+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "theaters",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T08:19:59.262427+00:00",
+          "event": "worker.task",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "editable": []
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T08:19:59.279548+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T08:19:59.290807+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "calendar_busy",
+            "arguments": {
+              "date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "source": "local",
+                "busy": []
+              }
+            },
+            "elapsed_ms": 1
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T08:19:59.297697+00:00",
+          "event": "worker.result",
+          "data": {
+            "tool": "calendar_busy",
+            "ok": true,
+            "replan": false,
+            "code": null
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T08:19:59.310709+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "execute"
           }
         },
         {
-          "sequence": 20,
-          "timestamp": "2026-11-19T07:37:45.976127+00:00",
+          "sequence": 34,
+          "timestamp": "2026-11-19T08:19:59.319960+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 21,
-          "timestamp": "2026-11-19T07:37:45.991210+00:00",
+          "sequence": 35,
+          "timestamp": "2026-11-19T08:19:59.324501+00:00",
           "event": "constraints.checked",
           "data": {
             "matching": 1,
@@ -2373,41 +3432,70 @@
           }
         },
         {
-          "sequence": 22,
-          "timestamp": "2026-11-19T07:37:46.003598+00:00",
+          "sequence": 36,
+          "timestamp": "2026-11-19T08:19:59.330274+00:00",
+          "event": "review.phase",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T08:19:59.348805+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "judge"
           }
         },
         {
-          "sequence": 23,
-          "timestamp": "2026-11-19T07:37:46.017097+00:00",
+          "sequence": 38,
+          "timestamp": "2026-11-19T08:19:59.361068+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 24,
-          "timestamp": "2026-11-19T07:37:46.019774+00:00",
+          "sequence": 39,
+          "timestamp": "2026-11-19T08:19:59.363642+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "respond"
           }
         },
         {
-          "sequence": 25,
-          "timestamp": "2026-11-19T07:37:46.052891+00:00",
+          "sequence": 40,
+          "timestamp": "2026-11-19T08:19:59.391176+00:00",
+          "event": "review.result",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 41,
+          "timestamp": "2026-11-19T08:19:59.408906+00:00",
           "event": "run.end",
           "data": {
             "status": "recommended",
-            "elapsed_ms": 299
+            "elapsed_ms": 448
           }
         }
       ],
       "log_saved": true,
-      "elapsed_ms": 299
+      "elapsed_ms": 448,
+      "evaluation": {
+        "status": "normal",
+        "warnings": []
+      },
+      "model_calls": {
+        "planner": 0,
+        "worker": 0,
+        "logger": 0
+      },
+      "documents": [],
+      "calendar_event": null
     }
   },
   "no_tool": {
@@ -2417,7 +3505,7 @@
       "replans": 0
     },
     "result": {
-      "run_id": "90fdda33-f1f1-45b5-b910-351197163ec6",
+      "run_id": "f690a463-33a8-44e5-9933-aaebf5746133",
       "mode": "demo",
       "status": "answered",
       "answer": "안녕하세요. 관람 날짜, 희망 시작 시각, 종료 마감 시각과 지역을 알려 주세요.",
@@ -2431,15 +3519,17 @@
       "events": [
         {
           "sequence": 1,
-          "timestamp": "2026-11-19T07:37:46.085016+00:00",
+          "timestamp": "2026-11-19T08:19:59.440963+00:00",
           "event": "run.start",
           "data": {
-            "mode": "demo"
+            "mode": "demo",
+            "worker": true,
+            "worker_llm": false
           }
         },
         {
           "sequence": 2,
-          "timestamp": "2026-11-19T07:37:46.101595+00:00",
+          "timestamp": "2026-11-19T08:19:59.461450+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "analyze"
@@ -2447,7 +3537,7 @@
         },
         {
           "sequence": 3,
-          "timestamp": "2026-11-19T07:37:46.122725+00:00",
+          "timestamp": "2026-11-19T08:19:59.477338+00:00",
           "event": "analysis.decision",
           "data": {
             "intent": "greeting",
@@ -2457,7 +3547,7 @@
         },
         {
           "sequence": 4,
-          "timestamp": "2026-11-19T07:37:46.136513+00:00",
+          "timestamp": "2026-11-19T08:19:59.491402+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "analyze"
@@ -2465,7 +3555,7 @@
         },
         {
           "sequence": 5,
-          "timestamp": "2026-11-19T07:37:46.153314+00:00",
+          "timestamp": "2026-11-19T08:19:59.503426+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "plan"
@@ -2473,21 +3563,16 @@
         },
         {
           "sequence": 6,
-          "timestamp": "2026-11-19T07:37:46.172630+00:00",
+          "timestamp": "2026-11-19T08:19:59.517103+00:00",
           "event": "plan.selected",
           "data": {
             "tools": [],
-            "missing": [
-              "관람 날짜",
-              "희망 시작 시각",
-              "종료 마감 시각",
-              "지역"
-            ]
+            "missing": []
           }
         },
         {
           "sequence": 7,
-          "timestamp": "2026-11-19T07:37:46.186512+00:00",
+          "timestamp": "2026-11-19T08:19:59.524115+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "plan"
@@ -2495,7 +3580,7 @@
         },
         {
           "sequence": 8,
-          "timestamp": "2026-11-19T07:37:46.205605+00:00",
+          "timestamp": "2026-11-19T08:19:59.540729+00:00",
           "event": "stage.enter",
           "data": {
             "stage": "respond"
@@ -2503,7 +3588,7 @@
         },
         {
           "sequence": 9,
-          "timestamp": "2026-11-19T07:37:46.220087+00:00",
+          "timestamp": "2026-11-19T08:19:59.550524+00:00",
           "event": "stage.exit",
           "data": {
             "stage": "respond"
@@ -2511,16 +3596,36 @@
         },
         {
           "sequence": 10,
-          "timestamp": "2026-11-19T07:37:46.236565+00:00",
+          "timestamp": "2026-11-19T08:19:59.566800+00:00",
+          "event": "review.result",
+          "data": {
+            "status": "normal",
+            "warnings": []
+          }
+        },
+        {
+          "sequence": 11,
+          "timestamp": "2026-11-19T08:19:59.585531+00:00",
           "event": "run.end",
           "data": {
             "status": "answered",
-            "elapsed_ms": 152
+            "elapsed_ms": 144
           }
         }
       ],
       "log_saved": true,
-      "elapsed_ms": 152
+      "elapsed_ms": 144,
+      "evaluation": {
+        "status": "normal",
+        "warnings": []
+      },
+      "model_calls": {
+        "planner": 0,
+        "worker": 0,
+        "logger": 0
+      },
+      "documents": [],
+      "calendar_event": null
     }
   }
 }

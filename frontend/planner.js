@@ -16,7 +16,12 @@ const stageLabels = {
   analyze: '요청 분석', plan: 'Tool 계획', execute: 'Tool 실행',
   judge: '시간 조건 확인', replan: '재계획', respond: '응답 생성',
 };
-const toolLabels = { box_office: '일별 박스오피스', weekly_box_office: '주간 박스오피스', movie_detail: '영화 상세', theaters: '영화관 위치' };
+const toolLabels = {
+  box_office: '일별 박스오피스', weekly_box_office: '주간 박스오피스', movie_detail: '영화 상세',
+  theaters: '영화관 위치', calendar_busy: '겹치는 일정 확인', calendar_register: '캘린더 등록',
+  rag_search: '작품 근거 검색',
+};
+const reviews = { normal: '이상 없음', abnormal: '이상 징후 발견', undetermined: '판정 불가' };
 
 function node(tag, content, className) {
   const element = document.createElement(tag);
@@ -59,6 +64,9 @@ function timeline(events) {
       label = `${toolLabels[data.tool]}${movie ? ` (${movie})` : ''} · ${outcome} · ${data.elapsed_ms}ms`;
     }
     if (event === 'run.error') label = data.message;
+    if (event === 'worker.decision') label = `Worker ${data.action} · ${data.reason}`;
+    if (event === 'review.result') label = `실행 평가 · ${reviews[data.status]} · 경고 ${data.warnings.length}건`;
+    if (event === 'review.diagnosis') label = `원인 진단 · ${data.summary}`;
     if (label) list.append(node('li', label, event === 'replan' ? 'replan' : ''));
   }
   return list;
@@ -84,18 +92,38 @@ function renderTurn(message, result) {
       node('p', `러닝타임 ${movie.runtime}분 · 늦어도 ${movie.latest_start} 시작${movie.rating ? ` · ${movie.rating}` : ''}`),
       action('계획에 담기', () => {
         fillPlan({ title: movie.title, date: result.conditions.date, starts_at: movie.latest_start,
-          ends_at: result.conditions.deadline.slice(0, 5) });
+          ends_at: movie.latest_end || result.conditions.deadline.slice(0, 5) });
         planStatus.textContent = '실제 상영 시간을 확인한 뒤 저장하세요.';
         planForm.elements.starts_at.focus();
       }),
     );
     article.append(item);
   }
+  if (result.documents?.length) {
+    article.append(node('h3', '근거 문서'));
+    const list = node('ul');
+    for (const documentRef of result.documents) {
+      const item = node('li');
+      if (/^https?:\/\//i.test(documentRef.url_or_file)) {
+        const link = node('a', documentRef.title);
+        link.href = documentRef.url_or_file;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        item.append(link);
+      } else {
+        item.append(node('strong', documentRef.title));
+      }
+      item.append(node('p', documentRef.excerpt));
+      if (documentRef.license) item.append(node('small', documentRef.license));
+      list.append(item);
+    }
+    article.append(list);
+  }
   if (result.theaters.length) {
     article.append(node('h3', '주변 영화관'));
     const list = node('ul');
     for (const theater of result.theaters) {
-      const item = node('li', `${theater.name} · ${theater.address}`);
+      const item = node('li', `${theater.name}${theater.address ? ` · ${theater.address}` : ''}`);
       if (/^https?:\/\//i.test(theater.url)) {
         const link = node('a', ' 위치 보기');
         link.href = theater.url;
@@ -106,6 +134,21 @@ function renderTurn(message, result) {
       list.append(item);
     }
     article.append(list);
+    if (result.mode === 'live') {
+      const source = node('a', '© OpenStreetMap contributors');
+      source.href = 'https://www.openstreetmap.org/copyright';
+      source.target = '_blank';
+      source.rel = 'noopener noreferrer';
+      article.append(source);
+    }
+  } else if (result.mode === 'live' && result.conditions.region && result.errors.some(error => error.tool === 'theaters')) {
+    const link = node('a', '지도에서 영화관 찾기');
+    link.href = `https://www.openstreetmap.org/search?query=${encodeURIComponent(result.conditions.region + ' 영화관')}`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    const fallback = node('p');
+    fallback.append(link);
+    article.append(fallback);
   }
   if (result.evidence.length || result.excluded.length) {
     const details = node('details');
@@ -170,6 +213,14 @@ async function refreshPlans() {
         if (editing === plan.id) fillPlan({});
         planStatus.textContent = '계획을 삭제했습니다.';
         await refreshPlans();
+      } catch (error) { planStatus.textContent = error.message; }
+    }), action('캘린더 등록', async () => {
+      try {
+        const result = await api(`/api/plans/${plan.id}/calendar`, 'POST');
+        planStatus.textContent = result.calendar_event
+          ? `${result.calendar_event.source === 'google' ? 'Google Calendar' : '로컬 캘린더'}에 등록했습니다.`
+          : result.answer;
+        await refreshLogs();
       } catch (error) { planStatus.textContent = error.message; }
     }));
     item.append(actions);

@@ -4,13 +4,20 @@ import tempfile
 import unittest
 from contextlib import ExitStack
 from dataclasses import replace
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 
 from app.ai.planner_tools import registry
+from app.ai.graph.planner import SEOUL
+from app.ai.planner_calendar import GoogleCalendar
+from app.ai.planner_events import EventStream
+from app.ai.planner_model import PlannerError
+from app.ai.planner_review import Diagnosis, assess, diagnose
+from app.ai.planner_worker import Recovery, Task, perform
+from app.ai.retrieval.evidence import Evidence
 from app.api import main
 from app.db.planner import PlannerRepository
 
@@ -95,25 +102,26 @@ class PlannerTests(unittest.TestCase):
             self.assertEqual(tools["movie_detail"].run({"movie_id": "invalid"})["error"]["code"], "INVALID_INPUT")
         schema = self.client.get("/openapi.json").json()
         self.assertIn("/api/planner/chat", schema["paths"])
-        self.assertEqual(len(self.client.get("/api/planner/tools").json()), 4)
+        tools = self.client.get("/api/planner/tools").json()
+        self.assertEqual(sum(tool["kind"] == "external" for tool in tools), 4)
+        self.assertEqual(sum(tool["kind"] == "local" for tool in tools), 3)
 
     def test_live_adapters_pass_candidate_id_and_preserve_model_tool_order(self):
-        from app.ai.graph import planner
+        from app.ai import planner_model
 
         answer = {"intent": "plan", "conditions": {"date": "2099-11-20", "earliest": "15:00",
                   "deadline": "18:00", "region": "강남"},
                   "tools": ["box_office", "theaters", "movie_detail"], "reason": "시간 제약이 있는 요청"}
         responses = [
             {"boxOfficeResult": {"dailyBoxOfficeList": [{"movieCd": "12345678", "movieNm": "예시 영화"}]}},
-            {"documents": [{"place_name": "예시관", "road_address_name": "강남", "place_url": "https://example.com"}]},
+            {"elements": [{"type": "node", "id": 123, "tags": {"name": "예시관", "addr:full": "강남"}}]},
             {"movieInfoResult": {"movieInfo": {"movieNm": "예시 영화", "showTm": "104"}}},
         ]
         environment = {"PLANNER_DEMO": "false", "GMS_API_KEY": "gms-example", "GMS_CHAT_MODEL": "example",
-                       "GMS_BASE_URL": "https://example.com/v1", "KOBIS_API_KEY": "kobis-example",
-                       "KAKAO_REST_API_KEY": "kakao-example"}
+                       "GMS_BASE_URL": "https://example.com/v1", "KOBIS_API_KEY": "kobis-example"}
         with (
             patch.dict(os.environ, environment),
-            patch.object(planner, "OpenAI") as openai,
+            patch.object(planner_model, "OpenAI") as openai,
             patch("app.ai.planner_tools.requests.get") as request,
         ):
             completion = openai.return_value.__enter__.return_value.chat.completions.create
@@ -123,7 +131,139 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual(result["mode"], "live")
         self.assertEqual(result["recommendations"][0]["movie_id"], "12345678")
         self.assertEqual([event["data"]["tool"] for event in result["events"] if event["event"] == "tool.request"],
-                         ["box_office", "theaters", "movie_detail"])
+                         ["box_office", "theaters", "movie_detail", "calendar_busy"])
         self.assertEqual(request.call_args_list[2].kwargs["params"]["movieCd"], "12345678")
-        self.assertEqual(request.call_args_list[1].kwargs["headers"]["Authorization"], "KakaoAK kakao-example")
+        self.assertNotIn("Authorization", request.call_args_list[1].kwargs["headers"])
+        self.assertIn('["amenity"="cinema"]', request.call_args_list[1].kwargs["params"]["data"])
+        self.assertEqual(result["theaters"][0]["url"], "https://www.openstreetmap.org/node/123")
         self.assertNotIn("kobis-example", json.dumps(result))
+
+    def test_previous_request_and_answer_are_recalled(self):
+        message = "내일 15:00 이후 강남에서 보고 16:40 전에 끝나는 영화"
+        first = self.chat(message)
+        second = self.chat("방금 추천 결과 뭐였어?")
+        self.assertIn(message, second["answer"])
+        self.assertIn(first["answer"], second["answer"])
+        self.assertEqual(second["recommendations"], first["recommendations"])
+
+    def test_calendar_register_uses_saved_values_and_filters_recommendations(self):
+        date_string = (datetime.now(SEOUL).date() + timedelta(days=1)).isoformat()
+        plan = {"title": "약속", "date": date_string, "starts_at": "15:00", "ends_at": "16:40"}
+        response = self.client.post("/api/plans", json=plan).json()
+        plan_id = response["plan"]["id"]
+        negated = self.chat(f"캘린더에 등록하지 마 {plan_id}")
+        self.assertIsNone(negated["calendar_event"])
+        path = f"/api/plans/{plan_id}/calendar"
+        result = self.client.post(path).json()
+        self.assertEqual(result["calendar_event"], {"source": "local", "event_id": plan_id})
+        self.assertEqual(self.client.post(path).json()["calendar_event"], result["calendar_event"])
+        result = self.chat("내일 15:00 이후 강남에서 보고 17:00 전에 끝나는 영화")
+        self.assertEqual(result["status"], "no_match")
+        self.assertTrue(any("연속 시간이 부족" in item["reason"] for item in result["excluded"]))
+        with TestClient(main.app) as visitor:
+            self.assertEqual(visitor.post(path).status_code, 404)
+
+    def test_calendar_google_adapter_contract(self):
+        calendar = GoogleCalendar(Path("unused"), "primary")
+        plan = {"id": "056090f5-bc90-4876-86b0-276f0c9cde74", "date": "2026-11-20",
+                "title": "영화", "starts_at": "15:00", "ends_at": "17:00"}
+        with patch.object(calendar, "service") as service:
+            active = service.return_value.__enter__.return_value
+            active.freebusy.return_value.query.return_value.execute.return_value = {
+                "calendars": {"primary": {"busy": [{"start": "2026-11-20T06:00:00Z", "end": "2026-11-20T08:00:00Z"}]}}
+            }
+            self.assertEqual(len(calendar.busy(date(2026, 11, 20))), 1)
+            event_id = calendar.register(plan)
+            payload = active.events.return_value.insert.call_args.kwargs["body"]
+            self.assertEqual(payload["id"], event_id)
+            self.assertEqual(payload["summary"], plan["title"])
+            self.assertEqual(payload["start"]["dateTime"], "2026-11-20T15:00:00+09:00")
+
+    def test_rag_selects_local_tool_returns_sources_or_no_index(self):
+        result = self.chat('"인터스텔라" 제작 배경이 뭐야?')
+        self.assertEqual(result["errors"][0]["code"], "NO_INDEX")
+        from app.ai.graph import planner
+
+        interpretation = planner.Interpretation(intent="rag", title="인터스텔라", tools=["rag_search"])
+        document = Evidence("근거1", "자료 본문", "wikipedia", "제작 배경 자료", "https://example.com/source")
+        with (
+            patch.dict(os.environ, {"PLANNER_DEMO": "false", "GMS_API_KEY": "gms-example"}),
+            patch.object(planner, "complete", return_value=interpretation),
+            patch("app.ai.planner_rag.VectorStore"),
+            patch("app.ai.planner_rag.OpenAIEmbedder"),
+            patch("app.ai.planner_rag.retrieve", return_value=[document]),
+            patch.object(main, "settings", replace(main.settings, chroma_dir=Path.cwd())),
+        ):
+            # An unquoted question exercises the model's routing choice.
+            result = self.chat("인터스텔라 제작 배경이 뭐야?")
+        self.assertEqual(result["documents"][0]["url_or_file"], "https://example.com/source")
+        self.assertEqual(result["evaluation"]["status"], "normal")
+
+
+class PlannerAdvancedUnitTests(unittest.TestCase):
+    def test_gms_key_is_only_used_with_gms_base(self):
+        from app.config import GMS_OPENAI_URL, openai_options
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "", "GMS_API_KEY": "gms-example", "GMS_BASE_URL": "",
+                                      "OPENAI_BASE_URL": "https://other.example/v1"}):
+            self.assertEqual(openai_options(), {"api_key": "gms-example", "base_url": GMS_OPENAI_URL})
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "openai-example", "GMS_API_KEY": "gms-example",
+                                      "OPENAI_BASE_URL": "https://other.example/v1"}):
+            self.assertEqual(openai_options(), {"api_key": "openai-example", "base_url": "https://other.example/v1"})
+
+    def test_abnormal_execution_causes_planner_replan(self):
+        from app.ai.graph import planner
+
+        stream = EventStream()
+
+        def with_anomaly(task, invoke, emit, decide=None, *, worker=True):
+            result = perform(task, invoke, emit, decide, worker=worker)
+            if task.tool == "theaters":
+                emit("tool.request", tool="unregistered", arguments={})
+            return result
+
+        with patch.object(planner, "perform", side_effect=with_anomaly):
+            result = planner.run_planner("내일 15:00 이후 강남에서 보고 19:00 전에 끝나는 영화", {},
+                                         stream.emit, demo=True, worker=True, events=stream.events)
+        self.assertEqual(result["status"], "recommended")
+        self.assertEqual(result["replans"], 1)
+        self.assertTrue(any(e["event"] == "review.phase" and e["data"]["status"] == "abnormal" for e in stream.events))
+
+    def test_review_rule_codes_and_model_diagnosis_are_separate(self):
+        stream = EventStream()
+        self.assertEqual(assess([], 1)["status"], "undetermined")
+        stream.emit("plan.selected", tools=["theaters"])
+        for _ in range(2):
+            stream.emit("tool.request", tool="movie_detail", arguments={"movie_id": "20200001"})
+            stream.emit("replan", tools=[])
+        outcome = assess(stream.events, 1)
+        self.assertEqual({warning["code"] for warning in outcome["warnings"]},
+                         {"DUPLICATE_CALL", "UNPLANNED_CALL", "EXCESSIVE_REPLAN"})
+        model = Mock(return_value=Diagnosis(summary="Tool 계획과 호출 경로를 확인하세요."))
+        diagnose(outcome, model, stream.emit, stream.events)
+        self.assertEqual(stream.events[-1]["event"], "review.diagnosis")
+        model.reset_mock()
+        diagnose({"status": "normal", "warnings": []}, model, stream.emit)
+        model.assert_not_called()
+        model.side_effect = PlannerError("MODEL_UNAVAILABLE", "unavailable")
+        diagnose(outcome, model, stream.emit)
+        self.assertEqual(stream.events[-1]["event"], "review.diagnosis_error")
+
+    def test_worker_retries_same_tool_and_keeps_fixed_arguments(self):
+        fail = {"ok": False, "error": {"code": "NO_RESULT", "message": "없음"}}
+        succeed = {"ok": True, "data": {"items": []}}
+        stream = EventStream()
+        task = Task("theaters", {"region": "강남"}, frozenset({"query_hint"}))
+        invoke = Mock(side_effect=[fail, succeed])
+        model = Mock(return_value=Recovery(action="retry", changes={"query_hint": "극장"}, reason="검색어 조정"))
+        self.assertTrue(perform(task, invoke, stream.emit, model).result["ok"])
+        invoke.assert_called_with("theaters", {"region": "강남", "query_hint": "극장"})
+
+        invoke = Mock(return_value=fail)
+        model.return_value = Recovery(action="retry", changes={"region": "다른 지역"}, reason="조건 변경")
+        self.assertTrue(perform(task, invoke, stream.emit, model).replan)
+        invoke.assert_called_once_with("theaters", {"region": "강남"})
+
+        invoke = Mock(return_value={"ok": False, "error": {"code": "MISSING_KEY", "message": "없음"}})
+        model.reset_mock()
+        self.assertFalse(perform(task, invoke, stream.emit, model).replan)
+        model.assert_not_called()

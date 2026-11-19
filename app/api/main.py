@@ -20,7 +20,7 @@ from app.ai.indexing.chunks import wiki_chunks
 from app.ai.indexing.vector_store import OpenAIEmbedder, VectorStore
 from app.ai.retrieval.discovery import discover_movies
 from app.ai.graph.chat_routing import local_chat_reply, local_movie_fact_reply
-from app.config import ROOT, Settings
+from app.config import ROOT, Settings, openai_options
 from app.db.collection_cache import CollectionCache
 from app.db.conversations import ConversationRepository
 from app.db.jobs import JobRepository
@@ -127,7 +127,7 @@ def browser_session(request: Request, response: Response) -> str:
     return session_id
 
 
-app.include_router(create_planner_router(browser_session, lambda: settings.cache_db))
+app.include_router(create_planner_router(browser_session, lambda: settings))
 
 
 @app.get("/planner", include_in_schema=False)
@@ -153,7 +153,7 @@ def create_qa_graph(*, mode: str = "chat"):
         store.client.get_collection("movie_meta"),
         store.client.get_collection("movie_docs"),
         OpenAIEmbedder(settings.embedding_model, timeout=8.0, max_retries=0),
-        OpenAI(timeout=20.0, max_retries=0),
+        OpenAI(**openai_options(), timeout=20.0, max_retries=0),
         os.getenv("MOVIELAB_CHAT_MODEL", "gpt-4.1-mini"),
         settings.top_k,
         mode=mode,
@@ -180,7 +180,7 @@ def index_status():
 
 @app.post("/api/discover")
 def discover(payload: DiscoverRequest):
-    if not os.getenv("OPENAI_API_KEY"):
+    if not openai_options():
         raise HTTPException(status_code=503, detail={"code": "MODEL_CONFIG_MISSING", "message": "모델 API 키가 설정되지 않았습니다."})
     if not settings.chroma_dir.exists():
         raise HTTPException(status_code=503, detail={"code": "INDEX_NOT_READY", "message": "영화 색인을 먼저 생성해 주세요."})
@@ -244,7 +244,7 @@ def chat(payload: ChatRequest, request: Request, response: Response):
             "response_type": "metadata",
             "elapsed_ms": 0, "retrieval_ms": 0, "generation_ms": 0,
         }
-    if not os.getenv("OPENAI_API_KEY"):
+    if not openai_options():
         raise HTTPException(status_code=503, detail={"code": "MODEL_CONFIG_MISSING", "message": "모델 API 키가 설정되지 않았습니다."})
     if not index_status()["ready"]:
         raise HTTPException(status_code=503, detail={"code": "INDEX_NOT_READY", "message": "영화 색인을 먼저 생성해 주세요."})
@@ -275,7 +275,7 @@ def chat(payload: ChatRequest, request: Request, response: Response):
 def guide(payload: GuideRequest, request: Request, response: Response):
     if not any(item["movie_id"] == payload.movie_id for item in movies()):
         raise HTTPException(status_code=404, detail={"code": "MOVIE_NOT_FOUND", "message": "영화를 찾을 수 없습니다."})
-    if not os.getenv("OPENAI_API_KEY"):
+    if not openai_options():
         raise HTTPException(status_code=503, detail={"code": "MODEL_CONFIG_MISSING", "message": "모델 API 키가 설정되지 않았습니다."})
     if not index_status()["ready"]:
         raise HTTPException(status_code=503, detail={"code": "INDEX_NOT_READY", "message": "영화 색인을 먼저 생성해 주세요."})
@@ -305,7 +305,7 @@ def collect_impl(payload: CollectRequest, on_stage=None):
     movie = next((item for item in movies() if item["movie_id"] == payload.movie_id), None)
     if movie is None:
         raise HTTPException(status_code=404, detail={"code": "MOVIE_NOT_FOUND", "message": "영화를 찾을 수 없습니다."})
-    if not os.getenv("OPENAI_API_KEY"):
+    if not openai_options():
         raise HTTPException(status_code=503, detail={"code": "MODEL_CONFIG_MISSING", "message": "모델 API 키가 설정되지 않았습니다."})
     started = time.perf_counter()
     source = (
@@ -419,7 +419,7 @@ def start_collection_job(
 ):
     if not any(item["movie_id"] == payload.movie_id for item in movies()):
         raise HTTPException(status_code=404, detail={"code": "MOVIE_NOT_FOUND", "message": "영화를 찾을 수 없습니다."})
-    if not os.getenv("OPENAI_API_KEY"):
+    if not openai_options():
         raise HTTPException(status_code=503, detail={"code": "MODEL_CONFIG_MISSING", "message": "모델 API 키가 설정되지 않았습니다."})
     session_id = browser_session(request, response)
     job_id = JobRepository(settings.cache_db).create(session_id, payload.movie_id)

@@ -13,7 +13,7 @@ from app.ai.data_prep.movies import load_movies
 from app.ai.evaluation import factual_match, percentile, representative_cases, unknown_acknowledged
 from app.ai.graph.qa import build_graph
 from app.ai.indexing.vector_store import OpenAIEmbedder, VectorStore
-from app.config import ROOT, Settings
+from app.config import ROOT, Settings, openai_options
 
 
 def evaluate(settings: Settings, client, embedder, case_set: str = "standard") -> dict:
@@ -118,7 +118,8 @@ def main() -> None:
     if not settings.chroma_dir.exists():
         parser.error("movie index is missing; run scripts.index_data first")
     from openai import OpenAI
-    report = evaluate(settings, OpenAI(timeout=20.0, max_retries=0), OpenAIEmbedder(settings.embedding_model, timeout=8.0, max_retries=0), args.case_set)
+    report = evaluate(settings, OpenAI(**openai_options(), timeout=20.0, max_retries=0),
+                      OpenAIEmbedder(settings.embedding_model, timeout=8.0, max_retries=0), args.case_set)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(markdown(report), encoding="utf-8")
     json_output = args.output.with_suffix(".json")

@@ -73,9 +73,12 @@ def main():
                 browser.evaluate("document.querySelector('#conversation details:last-of-type').open = true; window.scrollTo(0, 0)")
                 capture = browser.call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": True})
                 args.output.write_bytes(base64.b64decode(capture["data"]))
+                browser.evaluate("document.querySelectorAll('#plan-list button')[2].click()")
+                browser.wait_for("document.querySelector('#plan-status')?.textContent.includes('로컬 캘린더에 등록했습니다')")
+                browser.wait_for("document.querySelectorAll('#log-list li').length === 2")
                 browser.evaluate("window.confirm = () => true; document.querySelectorAll('#plan-list button')[1].click()")
                 browser.wait_for("document.querySelector('#plan-list')?.textContent.includes('저장한 관람 계획이 없습니다')")
-                browser.evaluate("document.querySelector('#log-list button').click()")
+                browser.evaluate("document.querySelectorAll('#log-list li')[1].querySelector('button').click()")
                 browser.wait_for("Boolean(document.querySelector('#log-detail .replan'))")
                 browser.call("Page.navigate", {"url": base + "/docs"})
                 browser.wait_for("document.querySelector('.swagger-ui')?.textContent.includes('/api/planner/chat')")
@@ -89,7 +92,7 @@ def main():
                 if process is not None:
                     process.terminate()
                     process.wait(timeout=10)
-    print("Browser passed: replan, plan save/edit/delete, log detail, OpenAPI.")
+    print("Browser passed: replan, plan save/edit/delete, local calendar registration, log detail, OpenAPI.")
 
 
 if __name__ == "__main__":

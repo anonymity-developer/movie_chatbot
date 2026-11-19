@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+GMS_OPENAI_URL = "https://gms.ssafy.io/gmsapi/api.openai.com/v1"
 try:
     from dotenv import load_dotenv
 except ImportError:
@@ -15,6 +16,14 @@ except ImportError:
     pass
 else:
     load_dotenv(ROOT / ".env")
+
+
+def openai_options() -> dict[str, str]:
+    key = os.getenv("OPENAI_API_KEY")
+    gms_key = os.getenv("GMS_API_KEY")
+    if key and key != gms_key:
+        return {"api_key": key, **({"base_url": base} if (base := os.getenv("OPENAI_BASE_URL")) else {})}
+    return {"api_key": gms_key, "base_url": os.getenv("GMS_BASE_URL") or GMS_OPENAI_URL} if gms_key else {}
 
 
 @dataclass(frozen=True)

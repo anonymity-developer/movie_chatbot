@@ -2,7 +2,11 @@
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from functools import lru_cache
+import json
 import os
+import re
+from time import time
 from typing import Callable
 
 from pydantic import BaseModel, Field, ValidationError
@@ -10,7 +14,7 @@ import requests
 
 
 KOBIS = "https://www.kobis.or.kr/kobisopenapi/webservice/rest"
-KAKAO = "https://dapi.kakao.com/v2/local/search/keyword.json"
+OVERPASS = "https://overpass-api.de/api/interpreter"
 
 
 class CandidateInput(BaseModel):
@@ -28,6 +32,7 @@ class WeeklyInput(BaseModel):
 
 class TheaterInput(BaseModel):
     region: str = Field(min_length=1, max_length=75)
+    query_hint: str = Field(default="영화관", min_length=1, max_length=30)
 
 
 class Candidate(BaseModel):
@@ -57,6 +62,7 @@ class Theater(BaseModel):
 
 class Theaters(BaseModel):
     items: list[Theater]
+    source: str
 
 
 class ToolFailure(Exception):
@@ -71,6 +77,7 @@ class Tool:
     input: type[BaseModel]
     output: type[BaseModel]
     handler: Callable
+    kind: str = "external"
 
     def run(self, arguments: dict) -> dict:
         try:
@@ -86,16 +93,13 @@ class Tool:
             return {"ok": False, "error": {"code": "INVALID_RESPONSE", "message": "외부 서비스의 응답을 읽을 수 없습니다."}}
 
 
-def fetch(url: str, params: dict, key_name: str, *, header: bool = False) -> dict:
-    key = os.getenv(key_name)
-    if not key:
-        raise ToolFailure("MISSING_KEY", f"서버의 {key_name} 설정을 확인해 주세요.")
+def request_json(url, params, *, timeout=(2, 4)):
     try:
         response = requests.get(
             url,
-            params=params if header else {**params, "key": key},
-            headers={"Authorization": f"KakaoAK {key}"} if header else {},
-            timeout=(2, 4),
+            params=params,
+            headers={"User-Agent": "AgenttripMoviePlanner/1.0 (https://github.com/anonymity-developer/movie_chatbot)"},
+            timeout=timeout,
         )
         if response.status_code in (401, 403):
             raise ToolFailure("AUTH_FAILED", "외부 서비스 인증 설정을 확인해 주세요.")
@@ -106,13 +110,67 @@ def fetch(url: str, params: dict, key_name: str, *, header: bool = False) -> dic
         raise ToolFailure("TIMEOUT", "외부 조회 시간이 초과되었습니다.") from None
     except requests.RequestException:
         raise ToolFailure("SOURCE_UNAVAILABLE", "외부 서비스에 연결할 수 없습니다.") from None
-    body = response.json()
+    return response.json()
+
+
+def fetch(url: str, params: dict, key_name: str) -> dict:
+    key = os.getenv(key_name)
+    if not key:
+        raise ToolFailure("MISSING_KEY", f"서버의 {key_name} 설정을 확인해 주세요.")
+    body = request_json(url, {**params, "key": key})
     if "faultInfo" in body:
         code = str(body["faultInfo"].get("errorCode", ""))
         if code in {"320010", "320011"}:
             raise ToolFailure("AUTH_FAILED", "KOBIS 인증 설정을 확인해 주세요.")
         raise ToolFailure("SOURCE_UNAVAILABLE", "KOBIS에서 조회를 완료하지 못했습니다.")
     return body
+
+
+def osm_names(region):
+    name = region.split()[-1]
+    city_names = {
+        "서울": "서울특별시", "부산": "부산광역시", "대구": "대구광역시", "인천": "인천광역시",
+        "광주": "광주광역시", "대전": "대전광역시", "울산": "울산광역시", "세종": "세종특별자치시",
+    }
+    if name in city_names:
+        return [city_names[name]]
+    return [name, name + "구"] if len(name) >= 2 and not name.endswith(("역", "구", "시", "군", "동", "읍", "면")) else [name]
+
+
+@lru_cache(maxsize=128)
+def osm_cinemas(endpoint, region, radius, hour):
+    bounds = "(33,124,39,132)"
+    local_names = osm_names(region)
+    stem = region.split()[-1].removesuffix("역")
+    # The request contains only validated public place names. Exact tag filters keep the query bounded.
+    def quoted(name):
+        return json.dumps(name, ensure_ascii=False)
+
+    station_query = "".join(
+        f'nwr["public_transport"="station"]["name"={quoted(name)}]{bounds};'
+        for name in (stem, stem + "역")
+    )
+    area_query = "".join(f'area["boundary"="administrative"]["name"={quoted(name)}];' for name in local_names)
+    query = "[out:json][timeout:8];" + f"({station_query})->.station;({area_query})->.district;" + (
+        f'(nwr(around.station:{radius})["amenity"="cinema"];'
+        f'nwr(area.district)["amenity"="cinema"]{bounds};);out center 15;'
+    )
+    body = request_json(endpoint, {"data": query}, timeout=(3, 13))
+    if body.get("remark"):
+        raise ToolFailure("SOURCE_UNAVAILABLE", "지도 서비스에서 영화관 조회를 완료하지 못했습니다.")
+    items = []
+    seen = set()
+    for row in body["elements"]:
+        tags = row.get("tags", {})
+        name = tags.get("name:ko") or tags.get("name")
+        if not name or name in seen or row["type"] not in {"node", "way", "relation"}:
+            continue
+        seen.add(name)
+        address = tags.get("addr:full") or " ".join(tags[key] for key in (
+            "addr:city", "addr:district", "addr:street", "addr:housenumber"
+        ) if tags.get(key))
+        items.append({"name": name, "address": address, "url": f"https://www.openstreetmap.org/{row['type']}/{int(row['id'])}"})
+    return items[:5]
 
 
 def lookup_day(requested: date | None, today: date, offset: int) -> date:
@@ -175,18 +233,19 @@ def registry(today: date, demo: bool) -> dict[str, Tool]:
 
     def theaters(args: TheaterInput):
         if demo:
-            return {"items": [{"name": "데모 · 영화관", "address": args.region, "url": ""}]}
-        body = fetch(KAKAO, {"query": f"{args.region} 영화관", "category_group_code": "CT1", "size": 5},
-                     "KAKAO_REST_API_KEY", header=True)
-        items = [{"name": row["place_name"], "address": row["road_address_name"] or row["address_name"],
-                  "url": row["place_url"]} for row in body["documents"]]
+            return {"source": "demo", "items": [{"name": "데모 · 영화관", "address": args.region, "url": ""}]}
+        region = " ".join(args.region.split())
+        if not re.fullmatch(r"[가-힣A-Za-z0-9 -]{2,75}", region):
+            raise ToolFailure("INVALID_INPUT", "공개 행정구역 또는 역 이름을 입력해 주세요.")
+        radius = 2200 if args.query_hint == "영화관" else 3500
+        items = osm_cinemas(os.getenv("PLANNER_OVERPASS_URL", OVERPASS), region, radius, int(time() // 3600))
         if not items:
-            raise ToolFailure("NO_RESULT", "해당 지역의 영화관 검색 결과가 없습니다.")
-        return {"items": items}
+            raise ToolFailure("NO_RESULT", "해당 지역의 OpenStreetMap 영화관 검색 결과가 없습니다. 구 또는 역 이름을 확인해 주세요.")
+        return {"source": "OpenStreetMap", "items": items}
 
     return {
         "box_office": Tool("후보 영화가 필요할 때 KOBIS 일별 순위 조회", CandidateInput, Candidates, candidates),
         "weekly_box_office": Tool("일별 순위에서 적합한 후보가 없을 때 주간 순위로 후보 보충", WeeklyInput, Candidates, weekly),
         "movie_detail": Tool("후보 ID로 러닝타임, 장르, 관람등급을 확인할 때", DetailInput, Detail, detail),
-        "theaters": Tool("요청 지역의 영화관 위치가 필요할 때 카카오 로컬 검색", TheaterInput, Theaters, theaters),
+        "theaters": Tool("공개 행정구역·역 주변 영화관이 필요할 때 OpenStreetMap 검색. 결과 없음에서 query_hint를 극장으로 바꾸면 역 주변 범위 확대", TheaterInput, Theaters, theaters),
     }

@@ -11,14 +11,24 @@ $env:PLANNER_DEMO = "true"
 .\.venv\Scripts\python.exe -m uvicorn app.api.main:app
 ```
 
-`http://127.0.0.1:8000/planner`에서 예시를 입력해 시작합니다. 원천 색인과 외부 키 없이 합성 데이터를 사용하는 데모입니다. 실제 연동은 `.env.example`을 `.env`에 복사한 뒤 GMS 개인 키, KOBIS 오픈 API 키, 카카오 로컬 조회 권한이 있는 앱의 REST API 키를 설정하고 `PLANNER_DEMO=false`로 실행합니다. 셸에 데모 변수를 설정한 경우 `Remove-Item Env:PLANNER_DEMO`로 셸 값을 해제하면 `.env`가 적용됩니다.
+`http://127.0.0.1:8000/planner`에서 예시를 입력해 시작합니다. 원천 색인과 외부 키 없이 합성 데이터를 사용하는 데모입니다. 실제 연동은 `.env.example`을 `.env`에 복사한 뒤 `GMS_API_KEY`와 `KOBIS_API_KEY`를 설정하고 `PLANNER_DEMO=false`로 실행합니다. 영화관은 가입과 키 발급 없이 OpenStreetMap Overpass에서 조회합니다. 셸에 데모 변수를 설정한 경우 `Remove-Item Env:PLANNER_DEMO`로 셸 값을 해제하면 `.env`가 적용됩니다.
 
 플래너의 후보는 박스오피스 집계에서 가져옵니다. 실제 상영편과 시작 시각은 영화관에서 확인해야 합니다. 계획에 담을 때 계산한 가능 시각이 채워지며 저장 전 수정할 수 있습니다.
+
+### 심화 기능과 실연동 설정
+
+- 실행 평가가 중복 호출, 과다 재계획, 계획에 없는 호출을 규칙으로 찾습니다. 실연동 모드에서는 이상으로 판정된 경우에만 GMS 진단을 요청합니다.
+- Planner가 만든 작업은 Worker가 실행하고, 인자를 조정할 수 있는 실패에서만 Worker의 GMS 판단을 사용합니다. `PLANNER_WORKER=false`는 기존 직접 실행과 비교할 때, `PLANNER_WORKER_LLM=false`는 Worker의 규칙 기반 실행과 비교할 때 사용합니다.
+- “인터스텔라 제작 배경이 뭐야?”처럼 문서 근거가 필요한 질문은 기존 Chroma 색인에서 찾습니다. `OPENAI_API_KEY`를 비워두면 `GMS_API_KEY`와 GMS의 OpenAI 호환 주소를 함께 사용합니다. `-m scripts.probe_planner --embedding`으로 키가 `text-embedding-3-small`을 사용할 수 있는지 확인한 뒤, 색인이 없으면 `-m scripts.index_data`를 실행합니다. 색인은 임베딩 API 사용량을 소비합니다. 별도 공급자를 쓸 경우 그 공급자의 `OPENAI_API_KEY`와 필요에 따라 `OPENAI_BASE_URL`을 설정합니다.
+- 기본 캘린더는 로컬 SQLite입니다. **캘린더 등록** 버튼이나 `캘린더에 등록 <저장한 계획 UUID>` 명령으로 저장한 계획을 등록합니다. 사용자의 등록 동작이 있을 때만 외부 일정이 변경됩니다. 다시 등록하면 같은 일정 ID를 갱신합니다. 계획을 지워도 이미 등록한 일정은 캘린더에 남습니다.
+- 기본값 `PLANNER_CALENDAR_BACKEND=local`이면 Google 설정 없이 이 프로젝트 안에서 일정이 저장됩니다. 실제 Google Calendar를 연결하려면 Google Cloud에서 Calendar API를 켜고 Google Auth Platform의 클라이언트 메뉴에서 유형이 **데스크톱 앱**인 OAuth 클라이언트를 만듭니다. 이때 Google이 내려주는 앱 설정 JSON을 `.local/google-calendar-client.json`에 저장합니다. `.\.venv\Scripts\python.exe -m scripts.connect_calendar`를 실행해 브라우저에서 자기 Google 계정으로 로그인하고 권한을 승인합니다. 앱이 테스트 중이면 해당 계정을 테스트 사용자로 추가합니다. 승인 후 `PLANNER_CALENDAR_BACKEND=google`을 설정하고 로컬에서 앱을 재시작합니다. [Google Calendar Python 가이드](https://developers.google.com/workspace/calendar/api/quickstart/python)
+- 실연동은 `.\.venv\Scripts\python.exe -m scripts.probe_planner`로 점검합니다. `--google`과 `--rag`를 추가하면 Google 일정 읽기와 Chroma 검색도 점검합니다.
 
 - [요구사항](submission/requirements.md) · [Agent 설계](submission/agent-design.md) · [Tool과 외부 API 출처](submission/tool-spec.md) · [API 명세](submission/api-spec.md)
 - [셀프 체크리스트](submission/checklist.md) · [대표 실행 로그](submission/execution-logs.json)
 - 전체 테스트는 `.\.venv\Scripts\python.exe -m unittest discover -s tests`로 실행합니다.
 - 대표 로그는 `.\.venv\Scripts\python.exe -m scripts.verify_planner --output submission/execution-logs.json`으로 다시 생성합니다.
+- Worker의 세 구성 비교는 `.\.venv\Scripts\python.exe -m scripts.compare_planner --output submission/worker-comparison.json`으로 재현합니다.
 
 Movie Lab은 영화를 찾고 작품에 대해 질문할 수 있는 영화 정보 서비스입니다. 영화 메타데이터와 관련 문서를 검색해 답변을 만들고, 답변에 사용한 출처를 함께 보여줍니다.
 

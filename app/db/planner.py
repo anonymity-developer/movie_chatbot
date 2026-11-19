@@ -16,6 +16,14 @@ class PlannerRepository:
                 CREATE TABLE IF NOT EXISTS planner_memory (
                     session_id TEXT PRIMARY KEY, conditions TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS planner_turns (
+                    session_id TEXT PRIMARY KEY, payload TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS planner_calendar (
+                    session_id TEXT NOT NULL, event_id TEXT NOT NULL, title TEXT NOT NULL,
+                    date TEXT NOT NULL, starts_at TEXT NOT NULL, ends_at TEXT NOT NULL,
+                    PRIMARY KEY (session_id, event_id)
+                );
                 CREATE TABLE IF NOT EXISTS planner_plans (
                     id TEXT PRIMARY KEY, session_id TEXT NOT NULL, title TEXT NOT NULL,
                     date TEXT NOT NULL, starts_at TEXT NOT NULL, ends_at TEXT NOT NULL,
@@ -41,16 +49,40 @@ class PlannerRepository:
             row = db.execute("SELECT conditions FROM planner_memory WHERE session_id=?", (session_id,)).fetchone()
         return json.loads(row["conditions"]) if row else {}
 
-    def update_memory(self, session_id, before, after):
+    def previous_turn(self, session_id):
+        with self.connect() as db:
+            row = db.execute("SELECT payload FROM planner_turns WHERE session_id=?", (session_id,)).fetchone()
+        return json.loads(row["payload"]) if row else {}
+
+    def update_memory(self, session_id, before, after, turn=None):
         changes = {key: value for key, value in after.items() if before.get(key) != value}
-        if not changes:
+        if not changes and turn is None:
             return
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT conditions FROM planner_memory WHERE session_id=?", (session_id,)).fetchone()
             latest = json.loads(row["conditions"]) if row else {}
-            db.execute("INSERT INTO planner_memory VALUES (?, ?) ON CONFLICT(session_id) DO UPDATE SET conditions=excluded.conditions",
-                       (session_id, json.dumps({**latest, **changes}, ensure_ascii=False)))
+            if changes:
+                db.execute("INSERT INTO planner_memory VALUES (?, ?) ON CONFLICT(session_id) DO UPDATE SET conditions=excluded.conditions",
+                           (session_id, json.dumps({**latest, **changes}, ensure_ascii=False)))
+            if turn is not None:
+                db.execute("INSERT INTO planner_turns VALUES (?, ?) ON CONFLICT(session_id) DO UPDATE SET payload=excluded.payload",
+                           (session_id, json.dumps(turn, ensure_ascii=False)))
+
+    def calendar_intervals(self, session_id, day):
+        with self.connect() as db:
+            rows = db.execute("""
+                SELECT starts_at, ends_at FROM planner_calendar WHERE session_id=? AND date=? ORDER BY starts_at
+            """, (session_id, day)).fetchall()
+        return [dict(row) for row in rows]
+
+    def register_calendar_plan(self, session_id, plan):
+        with self.connect() as db:
+            db.execute("""
+                INSERT INTO planner_calendar VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(session_id,event_id) DO UPDATE SET title=excluded.title, date=excluded.date,
+                    starts_at=excluded.starts_at, ends_at=excluded.ends_at
+            """, (session_id, plan["id"], plan["title"], plan["date"], plan["starts_at"], plan["ends_at"]))
 
     def save_event(self, session_id, run_id, entry):
         with self.connect() as db:

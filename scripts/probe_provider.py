@@ -7,7 +7,7 @@ import os
 
 from openai import OpenAI
 
-from app.config import Settings
+from app.config import Settings, openai_options
 
 
 def main() -> None:
@@ -15,10 +15,11 @@ def main() -> None:
     parser.add_argument("kind", choices=("embedding", "chat"))
     args = parser.parse_args()
     settings = Settings.from_env()
-    if not os.getenv("OPENAI_API_KEY"):
-        raise SystemExit("OPENAI_API_KEY is missing")
-    client = OpenAI()
-    print(f"gateway_configured={bool(os.getenv('OPENAI_BASE_URL'))}", flush=True)
+    options = openai_options()
+    if not options:
+        raise SystemExit("GMS_API_KEY or OPENAI_API_KEY is missing")
+    client = OpenAI(**options, timeout=10, max_retries=0)
+    print(f"gateway_configured={'base_url' in options}", flush=True)
     try:
         if args.kind == "embedding":
             response = client.embeddings.create(model=settings.embedding_model, input=["movie indexing probe"])
@@ -33,7 +34,7 @@ def main() -> None:
     except Exception as exc:
         print(
             f"{args.kind}_error type={type(exc).__name__} "
-            f"status={getattr(exc, 'status_code', None)} code={getattr(exc, 'code', None)}"
+            f"status={getattr(exc, 'status_code', None)}"
         )
         raise SystemExit(1) from None
 
