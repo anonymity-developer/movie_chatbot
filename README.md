@@ -1,5 +1,25 @@
 # Movie Lab
 
+## agenttrip 영화 관람 플래너
+
+관람 날짜·희망 시작 시각·종료 마감·지역으로 영화를 추천하고, 조회 근거와 재계획 로그를 확인하거나 관람 계획을 저장할 수 있습니다.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+$env:PLANNER_DEMO = "true"
+.\.venv\Scripts\python.exe -m uvicorn app.api.main:app
+```
+
+`http://127.0.0.1:8000/planner`에서 예시를 입력해 시작합니다. 원천 색인과 외부 키 없이 합성 데이터를 사용하는 데모입니다. 실제 연동은 `.env.example`을 `.env`에 복사한 뒤 GMS 개인 키, KOBIS 오픈 API 키, 카카오 로컬 조회 권한이 있는 앱의 REST API 키를 설정하고 `PLANNER_DEMO=false`로 실행합니다. 셸에 데모 변수를 설정한 경우 `Remove-Item Env:PLANNER_DEMO`로 셸 값을 해제하면 `.env`가 적용됩니다.
+
+플래너의 후보는 박스오피스 집계에서 가져옵니다. 실제 상영편과 시작 시각은 영화관에서 확인해야 합니다. 계획에 담을 때 계산한 가능 시각이 채워지며 저장 전 수정할 수 있습니다.
+
+- [요구사항](submission/requirements.md) · [Agent 설계](submission/agent-design.md) · [Tool과 외부 API 출처](submission/tool-spec.md) · [API 명세](submission/api-spec.md)
+- [셀프 체크리스트](submission/checklist.md) · [대표 실행 로그](submission/execution-logs.json)
+- 전체 테스트는 `.\.venv\Scripts\python.exe -m unittest discover -s tests`로 실행합니다.
+- 대표 로그는 `.\.venv\Scripts\python.exe -m scripts.verify_planner --output submission/execution-logs.json`으로 다시 생성합니다.
+
 Movie Lab은 영화를 찾고 작품에 대해 질문할 수 있는 영화 정보 서비스입니다. 영화 메타데이터와 관련 문서를 검색해 답변을 만들고, 답변에 사용한 출처를 함께 보여줍니다.
 
 ## 주요 기능

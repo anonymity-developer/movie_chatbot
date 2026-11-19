@@ -1,0 +1,2526 @@
+{
+  "first_pass": {
+    "request": "내일 15:00 이후 강남에서 보고 19:00 전에 끝나는 영화",
+    "expected": {
+      "status": "recommended",
+      "replans": 0
+    },
+    "result": {
+      "run_id": "c643da26-4906-46be-b6ac-074ef9550f99",
+      "mode": "demo",
+      "status": "recommended",
+      "answer": "시간 조건에 맞는 후보 2편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "conditions": {
+        "date": "2026-11-20",
+        "earliest": "15:00:00",
+        "deadline": "19:00:00",
+        "region": "강남"
+      },
+      "recommendations": [
+        {
+          "movie_id": "90000001",
+          "title": "데모 · 긴 여정",
+          "runtime": 170,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "required_minutes": 185,
+          "latest_start": "15:55"
+        },
+        {
+          "movie_id": "90000002",
+          "title": "데모 · 도시의 밤",
+          "runtime": 100,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "required_minutes": 115,
+          "latest_start": "17:05"
+        }
+      ],
+      "excluded": [
+        {
+          "movie_id": "90000003",
+          "title": "데모 · 상세 누락",
+          "reason": "러닝타임을 확인할 수 없습니다."
+        }
+      ],
+      "theaters": [
+        {
+          "name": "데모 · 영화관",
+          "address": "강남",
+          "url": ""
+        }
+      ],
+      "evidence": [
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-18",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000001",
+              "title": "데모 · 긴 여정"
+            },
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000003",
+              "title": "데모 · 상세 누락"
+            }
+          ]
+        }
+      ],
+      "errors": [
+        {
+          "tool": "movie_detail",
+          "movie_id": "90000003",
+          "code": "NO_RUNTIME",
+          "message": "러닝타임을 확인할 수 없습니다."
+        }
+      ],
+      "replans": 0,
+      "events": [
+        {
+          "sequence": 1,
+          "timestamp": "2026-11-19T07:37:44.217917+00:00",
+          "event": "run.start",
+          "data": {
+            "mode": "demo"
+          }
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-11-19T07:37:44.238703+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-11-19T07:37:44.255249+00:00",
+          "event": "analysis.decision",
+          "data": {
+            "intent": "plan",
+            "conditions": {
+              "date": "2026-11-20",
+              "earliest": "15:00:00",
+              "deadline": "19:00:00",
+              "region": "강남"
+            },
+            "reason": "관람 계획 요청"
+          }
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-11-19T07:37:44.268849+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 5,
+          "timestamp": "2026-11-19T07:37:44.281126+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 6,
+          "timestamp": "2026-11-19T07:37:44.289808+00:00",
+          "event": "plan.selected",
+          "data": {
+            "tools": [
+              "box_office",
+              "movie_detail",
+              "theaters"
+            ],
+            "missing": []
+          }
+        },
+        {
+          "sequence": 7,
+          "timestamp": "2026-11-19T07:37:44.307841+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 8,
+          "timestamp": "2026-11-19T07:37:44.318211+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 9,
+          "timestamp": "2026-11-19T07:37:44.324488+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T07:37:44.343894+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-18",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000001",
+                    "title": "데모 · 긴 여정"
+                  },
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000003",
+                    "title": "데모 · 상세 누락"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 11,
+          "timestamp": "2026-11-19T07:37:44.355439+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "timestamp": "2026-11-19T07:37:44.373219+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T07:37:44.383015+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T07:37:44.384932+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 긴 여정",
+                "runtime": 170,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "timestamp": "2026-11-19T07:37:44.412747+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 도시의 밤",
+                "runtime": 100,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 16,
+          "timestamp": "2026-11-19T07:37:44.423659+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "result": {
+              "ok": false,
+              "error": {
+                "code": "NO_RUNTIME",
+                "message": "러닝타임을 확인할 수 없습니다."
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T07:37:44.432201+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T07:37:44.442792+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "items": [
+                  {
+                    "name": "데모 · 영화관",
+                    "address": "강남",
+                    "url": ""
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T07:37:44.455344+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 20,
+          "timestamp": "2026-11-19T07:37:44.472108+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T07:37:44.483120+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 2,
+            "excluded": 1,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T07:37:44.490507+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T07:37:44.507966+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 24,
+          "timestamp": "2026-11-19T07:37:44.518371+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T07:37:44.536343+00:00",
+          "event": "run.end",
+          "data": {
+            "status": "recommended",
+            "elapsed_ms": 318
+          }
+        }
+      ],
+      "log_saved": true,
+      "elapsed_ms": 318
+    }
+  },
+  "replan_match": {
+    "request": "내일 15:00 이후 강남에서 보고 16:40 전에 끝나는 영화",
+    "expected": {
+      "status": "recommended",
+      "replans": 1
+    },
+    "result": {
+      "run_id": "f2c71cd0-5c37-41ee-a0a7-5ae67ad50eb0",
+      "mode": "demo",
+      "status": "recommended",
+      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "conditions": {
+        "date": "2026-11-20",
+        "earliest": "15:00:00",
+        "deadline": "16:40:00",
+        "region": "강남"
+      },
+      "recommendations": [
+        {
+          "movie_id": "90000004",
+          "title": "데모 · 짧은 산책",
+          "runtime": 72,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "required_minutes": 87,
+          "latest_start": "15:13"
+        }
+      ],
+      "excluded": [
+        {
+          "movie_id": "90000003",
+          "title": "데모 · 상세 누락",
+          "reason": "러닝타임을 확인할 수 없습니다."
+        },
+        {
+          "movie_id": "90000001",
+          "title": "데모 · 긴 여정",
+          "runtime": 170,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000002",
+          "title": "데모 · 도시의 밤",
+          "runtime": 100,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 115분이 희망 시간 범위를 초과합니다."
+        }
+      ],
+      "theaters": [
+        {
+          "name": "데모 · 영화관",
+          "address": "강남",
+          "url": ""
+        }
+      ],
+      "evidence": [
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-18",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000001",
+              "title": "데모 · 긴 여정"
+            },
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000003",
+              "title": "데모 · 상세 누락"
+            }
+          ]
+        },
+        {
+          "tool": "weekly_box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-15",
+          "period": "weekly",
+          "items": [
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000004",
+              "title": "데모 · 짧은 산책"
+            }
+          ]
+        }
+      ],
+      "errors": [
+        {
+          "tool": "movie_detail",
+          "movie_id": "90000003",
+          "code": "NO_RUNTIME",
+          "message": "러닝타임을 확인할 수 없습니다."
+        }
+      ],
+      "replans": 1,
+      "events": [
+        {
+          "sequence": 1,
+          "timestamp": "2026-11-19T07:37:44.557920+00:00",
+          "event": "run.start",
+          "data": {
+            "mode": "demo"
+          }
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-11-19T07:37:44.574079+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-11-19T07:37:44.584790+00:00",
+          "event": "analysis.decision",
+          "data": {
+            "intent": "plan",
+            "conditions": {
+              "date": "2026-11-20",
+              "earliest": "15:00:00",
+              "deadline": "16:40:00",
+              "region": "강남"
+            },
+            "reason": "관람 계획 요청"
+          }
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-11-19T07:37:44.601160+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 5,
+          "timestamp": "2026-11-19T07:37:44.610744+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 6,
+          "timestamp": "2026-11-19T07:37:44.618483+00:00",
+          "event": "plan.selected",
+          "data": {
+            "tools": [
+              "box_office",
+              "movie_detail",
+              "theaters"
+            ],
+            "missing": []
+          }
+        },
+        {
+          "sequence": 7,
+          "timestamp": "2026-11-19T07:37:44.618483+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 8,
+          "timestamp": "2026-11-19T07:37:44.644232+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 9,
+          "timestamp": "2026-11-19T07:37:44.651783+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T07:37:44.656671+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-18",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000001",
+                    "title": "데모 · 긴 여정"
+                  },
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000003",
+                    "title": "데모 · 상세 누락"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 11,
+          "timestamp": "2026-11-19T07:37:44.675278+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "timestamp": "2026-11-19T07:37:44.685306+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T07:37:44.685306+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T07:37:44.708926+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 긴 여정",
+                "runtime": 170,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "timestamp": "2026-11-19T07:37:44.718874+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 도시의 밤",
+                "runtime": 100,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 16,
+          "timestamp": "2026-11-19T07:37:44.731993+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "result": {
+              "ok": false,
+              "error": {
+                "code": "NO_RUNTIME",
+                "message": "러닝타임을 확인할 수 없습니다."
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T07:37:44.743117+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T07:37:44.755570+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "items": [
+                  {
+                    "name": "데모 · 영화관",
+                    "address": "강남",
+                    "url": ""
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T07:37:44.755570+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 20,
+          "timestamp": "2026-11-19T07:37:44.778363+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T07:37:44.785369+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 0,
+            "excluded": 3,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T07:37:44.800085+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T07:37:44.810621+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 24,
+          "timestamp": "2026-11-19T07:37:44.818652+00:00",
+          "event": "replan",
+          "data": {
+            "attempt": 1,
+            "reason": "시간을 충족하는 후보 없음. 주간 순위에서 후보 보충",
+            "tools": [
+              "weekly_box_office",
+              "movie_detail"
+            ]
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T07:37:44.834813+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T07:37:44.847192+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 27,
+          "timestamp": "2026-11-19T07:37:44.855854+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 28,
+          "timestamp": "2026-11-19T07:37:44.869590+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-15",
+                "period": "weekly",
+                "items": [
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000004",
+                    "title": "데모 · 짧은 산책"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T07:37:44.879644+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            }
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T07:37:44.890294+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 짧은 산책",
+                "runtime": 72,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T07:37:44.900926+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T07:37:44.910731+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T07:37:44.918551+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 1,
+            "excluded": 3,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 34,
+          "timestamp": "2026-11-19T07:37:44.918551+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 35,
+          "timestamp": "2026-11-19T07:37:44.942280+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 36,
+          "timestamp": "2026-11-19T07:37:44.952235+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T07:37:44.974839+00:00",
+          "event": "run.end",
+          "data": {
+            "status": "recommended",
+            "elapsed_ms": 417
+          }
+        }
+      ],
+      "log_saved": true,
+      "elapsed_ms": 417
+    }
+  },
+  "replan_limit": {
+    "request": "내일 15:30 이후 강남에서 보고 16:40 전에 끝나는 영화",
+    "expected": {
+      "status": "no_match",
+      "replans": 3
+    },
+    "result": {
+      "run_id": "bbed4da8-a3d9-4808-be89-1ea65960fa4c",
+      "mode": "demo",
+      "status": "no_match",
+      "answer": "재계획 3회 후에도 시간 조건에 맞는 영화를 찾지 못했습니다. 시작 가능 시각이나 종료 마감 시각을 조정해 주세요.",
+      "conditions": {
+        "date": "2026-11-20",
+        "earliest": "15:30:00",
+        "deadline": "16:40:00",
+        "region": "강남"
+      },
+      "recommendations": [],
+      "excluded": [
+        {
+          "movie_id": "90000003",
+          "title": "데모 · 상세 누락",
+          "reason": "러닝타임을 확인할 수 없습니다."
+        },
+        {
+          "movie_id": "90000001",
+          "title": "데모 · 긴 여정",
+          "runtime": 170,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000002",
+          "title": "데모 · 도시의 밤",
+          "runtime": 100,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 115분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000004",
+          "title": "데모 · 짧은 산책",
+          "runtime": 72,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 87분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000005",
+          "title": "데모 · 새벽",
+          "runtime": 105,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 120분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000006",
+          "title": "데모 · 그림자",
+          "runtime": 110,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 125분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000007",
+          "title": "데모 · 바다",
+          "runtime": 115,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 130분이 희망 시간 범위를 초과합니다."
+        },
+        {
+          "movie_id": "90000008",
+          "title": "데모 · 노을",
+          "runtime": 120,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 135분이 희망 시간 범위를 초과합니다."
+        }
+      ],
+      "theaters": [
+        {
+          "name": "데모 · 영화관",
+          "address": "강남",
+          "url": ""
+        }
+      ],
+      "evidence": [
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-18",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000001",
+              "title": "데모 · 긴 여정"
+            },
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000003",
+              "title": "데모 · 상세 누락"
+            }
+          ]
+        },
+        {
+          "tool": "weekly_box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-15",
+          "period": "weekly",
+          "items": [
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000004",
+              "title": "데모 · 짧은 산책"
+            }
+          ]
+        },
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-16",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000005",
+              "title": "데모 · 새벽"
+            },
+            {
+              "movie_id": "90000006",
+              "title": "데모 · 그림자"
+            }
+          ]
+        },
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-15",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000007",
+              "title": "데모 · 바다"
+            },
+            {
+              "movie_id": "90000008",
+              "title": "데모 · 노을"
+            }
+          ]
+        }
+      ],
+      "errors": [
+        {
+          "tool": "movie_detail",
+          "movie_id": "90000003",
+          "code": "NO_RUNTIME",
+          "message": "러닝타임을 확인할 수 없습니다."
+        }
+      ],
+      "replans": 3,
+      "events": [
+        {
+          "sequence": 1,
+          "timestamp": "2026-11-19T07:37:44.994926+00:00",
+          "event": "run.start",
+          "data": {
+            "mode": "demo"
+          }
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-11-19T07:37:45.014966+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-11-19T07:37:45.018572+00:00",
+          "event": "analysis.decision",
+          "data": {
+            "intent": "plan",
+            "conditions": {
+              "date": "2026-11-20",
+              "earliest": "15:30:00",
+              "deadline": "16:40:00",
+              "region": "강남"
+            },
+            "reason": "관람 계획 요청"
+          }
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-11-19T07:37:45.035023+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 5,
+          "timestamp": "2026-11-19T07:37:45.044749+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 6,
+          "timestamp": "2026-11-19T07:37:45.053258+00:00",
+          "event": "plan.selected",
+          "data": {
+            "tools": [
+              "box_office",
+              "movie_detail",
+              "theaters"
+            ],
+            "missing": []
+          }
+        },
+        {
+          "sequence": 7,
+          "timestamp": "2026-11-19T07:37:45.068408+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 8,
+          "timestamp": "2026-11-19T07:37:45.081718+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 9,
+          "timestamp": "2026-11-19T07:37:45.085340+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T07:37:45.103242+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-18",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000001",
+                    "title": "데모 · 긴 여정"
+                  },
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000003",
+                    "title": "데모 · 상세 누락"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 11,
+          "timestamp": "2026-11-19T07:37:45.114876+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "timestamp": "2026-11-19T07:37:45.120599+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T07:37:45.135626+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T07:37:45.146739+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 긴 여정",
+                "runtime": 170,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "timestamp": "2026-11-19T07:37:45.156343+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 도시의 밤",
+                "runtime": 100,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 16,
+          "timestamp": "2026-11-19T07:37:45.170477+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "result": {
+              "ok": false,
+              "error": {
+                "code": "NO_RUNTIME",
+                "message": "러닝타임을 확인할 수 없습니다."
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T07:37:45.183580+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T07:37:45.193156+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "강남"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "items": [
+                  {
+                    "name": "데모 · 영화관",
+                    "address": "강남",
+                    "url": ""
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T07:37:45.210964+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 20,
+          "timestamp": "2026-11-19T07:37:45.219450+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T07:37:45.219450+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 0,
+            "excluded": 3,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T07:37:45.241295+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T07:37:45.252145+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 24,
+          "timestamp": "2026-11-19T07:37:45.259728+00:00",
+          "event": "replan",
+          "data": {
+            "attempt": 1,
+            "reason": "시간을 충족하는 후보 없음. 주간 순위에서 후보 보충",
+            "tools": [
+              "weekly_box_office",
+              "movie_detail"
+            ]
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T07:37:45.272653+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 26,
+          "timestamp": "2026-11-19T07:37:45.286152+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 27,
+          "timestamp": "2026-11-19T07:37:45.300982+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            }
+          }
+        },
+        {
+          "sequence": 28,
+          "timestamp": "2026-11-19T07:37:45.310507+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "weekly_box_office",
+            "arguments": {
+              "requested_date": "2026-11-20"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-15",
+                "period": "weekly",
+                "items": [
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000004",
+                    "title": "데모 · 짧은 산책"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 29,
+          "timestamp": "2026-11-19T07:37:45.318866+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            }
+          }
+        },
+        {
+          "sequence": 30,
+          "timestamp": "2026-11-19T07:37:45.318866+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000004"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 짧은 산책",
+                "runtime": 72,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-11-19T07:37:45.344666+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 32,
+          "timestamp": "2026-11-19T07:37:45.352328+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 33,
+          "timestamp": "2026-11-19T07:37:45.356834+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 0,
+            "excluded": 4,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 34,
+          "timestamp": "2026-11-19T07:37:45.377276+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 35,
+          "timestamp": "2026-11-19T07:37:45.387506+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 36,
+          "timestamp": "2026-11-19T07:37:45.387506+00:00",
+          "event": "replan",
+          "data": {
+            "attempt": 2,
+            "reason": "시간을 충족하는 후보 없음. 이전 집계일 탐색",
+            "tools": [
+              "box_office",
+              "movie_detail"
+            ]
+          }
+        },
+        {
+          "sequence": 37,
+          "timestamp": "2026-11-19T07:37:45.408790+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 38,
+          "timestamp": "2026-11-19T07:37:45.419027+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 39,
+          "timestamp": "2026-11-19T07:37:45.421222+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 2
+            }
+          }
+        },
+        {
+          "sequence": 40,
+          "timestamp": "2026-11-19T07:37:45.440799+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 2
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-16",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000005",
+                    "title": "데모 · 새벽"
+                  },
+                  {
+                    "movie_id": "90000006",
+                    "title": "데모 · 그림자"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 41,
+          "timestamp": "2026-11-19T07:37:45.452668+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000005"
+            }
+          }
+        },
+        {
+          "sequence": 42,
+          "timestamp": "2026-11-19T07:37:45.456936+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000006"
+            }
+          }
+        },
+        {
+          "sequence": 43,
+          "timestamp": "2026-11-19T07:37:45.475363+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000005"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 새벽",
+                "runtime": 105,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 44,
+          "timestamp": "2026-11-19T07:37:45.487083+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000006"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 그림자",
+                "runtime": 110,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 45,
+          "timestamp": "2026-11-19T07:37:45.498156+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 46,
+          "timestamp": "2026-11-19T07:37:45.507911+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 47,
+          "timestamp": "2026-11-19T07:37:45.519034+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 0,
+            "excluded": 6,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 48,
+          "timestamp": "2026-11-19T07:37:45.530306+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 49,
+          "timestamp": "2026-11-19T07:37:45.540505+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 50,
+          "timestamp": "2026-11-19T07:37:45.550523+00:00",
+          "event": "replan",
+          "data": {
+            "attempt": 3,
+            "reason": "시간을 충족하는 후보 없음. 이전 집계일 탐색",
+            "tools": [
+              "box_office",
+              "movie_detail"
+            ]
+          }
+        },
+        {
+          "sequence": 51,
+          "timestamp": "2026-11-19T07:37:45.559030+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "replan"
+          }
+        },
+        {
+          "sequence": 52,
+          "timestamp": "2026-11-19T07:37:45.571477+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 53,
+          "timestamp": "2026-11-19T07:37:45.574717+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 3
+            }
+          }
+        },
+        {
+          "sequence": 54,
+          "timestamp": "2026-11-19T07:37:45.589778+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 3
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-15",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000007",
+                    "title": "데모 · 바다"
+                  },
+                  {
+                    "movie_id": "90000008",
+                    "title": "데모 · 노을"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 55,
+          "timestamp": "2026-11-19T07:37:45.602088+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000007"
+            }
+          }
+        },
+        {
+          "sequence": 56,
+          "timestamp": "2026-11-19T07:37:45.612768+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000008"
+            }
+          }
+        },
+        {
+          "sequence": 57,
+          "timestamp": "2026-11-19T07:37:45.619150+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000007"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 바다",
+                "runtime": 115,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 58,
+          "timestamp": "2026-11-19T07:37:45.636710+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000008"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 노을",
+                "runtime": 120,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 59,
+          "timestamp": "2026-11-19T07:37:45.651289+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 60,
+          "timestamp": "2026-11-19T07:37:45.657113+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 61,
+          "timestamp": "2026-11-19T07:37:45.674195+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 0,
+            "excluded": 8,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 62,
+          "timestamp": "2026-11-19T07:37:45.683190+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 63,
+          "timestamp": "2026-11-19T07:37:45.685970+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 64,
+          "timestamp": "2026-11-19T07:37:45.702941+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 65,
+          "timestamp": "2026-11-19T07:37:45.720095+00:00",
+          "event": "run.end",
+          "data": {
+            "status": "no_match",
+            "elapsed_ms": 729
+          }
+        }
+      ],
+      "log_saved": true,
+      "elapsed_ms": 729
+    }
+  },
+  "detail_failure": {
+    "request": "내일 14:00 이후 홍대에서 보고 17:00 전에 끝나는 영화",
+    "expected": {
+      "status": "recommended",
+      "replans": 0
+    },
+    "result": {
+      "run_id": "f2529cf5-b540-40a5-8f7c-c0685dcdb385",
+      "mode": "demo",
+      "status": "recommended",
+      "answer": "시간 조건에 맞는 후보 1편을 찾았습니다. 러닝타임과 입장 여유 15분을 반영했어요. 영화관 목록은 위치 참고용입니다. 상영 편성과 실제 시각은 영화관에서 확인해 주세요.",
+      "conditions": {
+        "date": "2026-11-20",
+        "earliest": "14:00:00",
+        "deadline": "17:00:00",
+        "region": "홍대"
+      },
+      "recommendations": [
+        {
+          "movie_id": "90000002",
+          "title": "데모 · 도시의 밤",
+          "runtime": 100,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "required_minutes": 115,
+          "latest_start": "15:05"
+        }
+      ],
+      "excluded": [
+        {
+          "movie_id": "90000003",
+          "title": "데모 · 상세 누락",
+          "reason": "러닝타임을 확인할 수 없습니다."
+        },
+        {
+          "movie_id": "90000001",
+          "title": "데모 · 긴 여정",
+          "runtime": 170,
+          "rating": "12세이상관람가",
+          "genres": [
+            "드라마"
+          ],
+          "reason": "입장 여유 포함 185분이 희망 시간 범위를 초과합니다."
+        }
+      ],
+      "theaters": [
+        {
+          "name": "데모 · 영화관",
+          "address": "홍대",
+          "url": ""
+        }
+      ],
+      "evidence": [
+        {
+          "tool": "box_office",
+          "source": "KOBIS",
+          "requested_date": "2026-11-20",
+          "lookup_date": "2026-11-18",
+          "period": "daily",
+          "items": [
+            {
+              "movie_id": "90000001",
+              "title": "데모 · 긴 여정"
+            },
+            {
+              "movie_id": "90000002",
+              "title": "데모 · 도시의 밤"
+            },
+            {
+              "movie_id": "90000003",
+              "title": "데모 · 상세 누락"
+            }
+          ]
+        }
+      ],
+      "errors": [
+        {
+          "tool": "movie_detail",
+          "movie_id": "90000003",
+          "code": "NO_RUNTIME",
+          "message": "러닝타임을 확인할 수 없습니다."
+        }
+      ],
+      "replans": 0,
+      "events": [
+        {
+          "sequence": 1,
+          "timestamp": "2026-11-19T07:37:45.752338+00:00",
+          "event": "run.start",
+          "data": {
+            "mode": "demo"
+          }
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-11-19T07:37:45.768240+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-11-19T07:37:45.769651+00:00",
+          "event": "analysis.decision",
+          "data": {
+            "intent": "plan",
+            "conditions": {
+              "date": "2026-11-20",
+              "earliest": "14:00:00",
+              "deadline": "17:00:00",
+              "region": "홍대"
+            },
+            "reason": "관람 계획 요청"
+          }
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-11-19T07:37:45.788702+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 5,
+          "timestamp": "2026-11-19T07:37:45.802146+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 6,
+          "timestamp": "2026-11-19T07:37:45.806642+00:00",
+          "event": "plan.selected",
+          "data": {
+            "tools": [
+              "box_office",
+              "movie_detail",
+              "theaters"
+            ],
+            "missing": []
+          }
+        },
+        {
+          "sequence": 7,
+          "timestamp": "2026-11-19T07:37:45.819013+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 8,
+          "timestamp": "2026-11-19T07:37:45.819013+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 9,
+          "timestamp": "2026-11-19T07:37:45.845018+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            }
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T07:37:45.853209+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "box_office",
+            "arguments": {
+              "requested_date": "2026-11-20",
+              "offset": 0
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "requested_date": "2026-11-20",
+                "lookup_date": "2026-11-18",
+                "period": "daily",
+                "items": [
+                  {
+                    "movie_id": "90000001",
+                    "title": "데모 · 긴 여정"
+                  },
+                  {
+                    "movie_id": "90000002",
+                    "title": "데모 · 도시의 밤"
+                  },
+                  {
+                    "movie_id": "90000003",
+                    "title": "데모 · 상세 누락"
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 11,
+          "timestamp": "2026-11-19T07:37:45.867652+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            }
+          }
+        },
+        {
+          "sequence": 12,
+          "timestamp": "2026-11-19T07:37:45.869214+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            }
+          }
+        },
+        {
+          "sequence": 13,
+          "timestamp": "2026-11-19T07:37:45.886125+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            }
+          }
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-11-19T07:37:45.886125+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000001"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 긴 여정",
+                "runtime": 170,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 15,
+          "timestamp": "2026-11-19T07:37:45.902762+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000002"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "title": "데모 · 도시의 밤",
+                "runtime": 100,
+                "rating": "12세이상관람가",
+                "genres": [
+                  "드라마"
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 16,
+          "timestamp": "2026-11-19T07:37:45.919917+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "movie_detail",
+            "arguments": {
+              "movie_id": "90000003"
+            },
+            "result": {
+              "ok": false,
+              "error": {
+                "code": "NO_RUNTIME",
+                "message": "러닝타임을 확인할 수 없습니다."
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-11-19T07:37:45.935814+00:00",
+          "event": "tool.request",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "홍대"
+            }
+          }
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-11-19T07:37:45.951439+00:00",
+          "event": "tool.response",
+          "data": {
+            "tool": "theaters",
+            "arguments": {
+              "region": "홍대"
+            },
+            "result": {
+              "ok": true,
+              "data": {
+                "items": [
+                  {
+                    "name": "데모 · 영화관",
+                    "address": "홍대",
+                    "url": ""
+                  }
+                ]
+              }
+            },
+            "elapsed_ms": 0
+          }
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-11-19T07:37:45.958422+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "execute"
+          }
+        },
+        {
+          "sequence": 20,
+          "timestamp": "2026-11-19T07:37:45.976127+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 21,
+          "timestamp": "2026-11-19T07:37:45.991210+00:00",
+          "event": "constraints.checked",
+          "data": {
+            "matching": 1,
+            "excluded": 2,
+            "buffer_minutes": 15
+          }
+        },
+        {
+          "sequence": 22,
+          "timestamp": "2026-11-19T07:37:46.003598+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "judge"
+          }
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-11-19T07:37:46.017097+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 24,
+          "timestamp": "2026-11-19T07:37:46.019774+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-11-19T07:37:46.052891+00:00",
+          "event": "run.end",
+          "data": {
+            "status": "recommended",
+            "elapsed_ms": 299
+          }
+        }
+      ],
+      "log_saved": true,
+      "elapsed_ms": 299
+    }
+  },
+  "no_tool": {
+    "request": "안녕하세요",
+    "expected": {
+      "status": "answered",
+      "replans": 0
+    },
+    "result": {
+      "run_id": "90fdda33-f1f1-45b5-b910-351197163ec6",
+      "mode": "demo",
+      "status": "answered",
+      "answer": "안녕하세요. 관람 날짜, 희망 시작 시각, 종료 마감 시각과 지역을 알려 주세요.",
+      "conditions": {},
+      "recommendations": [],
+      "excluded": [],
+      "theaters": [],
+      "evidence": [],
+      "errors": [],
+      "replans": 0,
+      "events": [
+        {
+          "sequence": 1,
+          "timestamp": "2026-11-19T07:37:46.085016+00:00",
+          "event": "run.start",
+          "data": {
+            "mode": "demo"
+          }
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-11-19T07:37:46.101595+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-11-19T07:37:46.122725+00:00",
+          "event": "analysis.decision",
+          "data": {
+            "intent": "greeting",
+            "conditions": {},
+            "reason": "인사 요청"
+          }
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-11-19T07:37:46.136513+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "analyze"
+          }
+        },
+        {
+          "sequence": 5,
+          "timestamp": "2026-11-19T07:37:46.153314+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 6,
+          "timestamp": "2026-11-19T07:37:46.172630+00:00",
+          "event": "plan.selected",
+          "data": {
+            "tools": [],
+            "missing": [
+              "관람 날짜",
+              "희망 시작 시각",
+              "종료 마감 시각",
+              "지역"
+            ]
+          }
+        },
+        {
+          "sequence": 7,
+          "timestamp": "2026-11-19T07:37:46.186512+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "plan"
+          }
+        },
+        {
+          "sequence": 8,
+          "timestamp": "2026-11-19T07:37:46.205605+00:00",
+          "event": "stage.enter",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 9,
+          "timestamp": "2026-11-19T07:37:46.220087+00:00",
+          "event": "stage.exit",
+          "data": {
+            "stage": "respond"
+          }
+        },
+        {
+          "sequence": 10,
+          "timestamp": "2026-11-19T07:37:46.236565+00:00",
+          "event": "run.end",
+          "data": {
+            "status": "answered",
+            "elapsed_ms": 152
+          }
+        }
+      ],
+      "log_saved": true,
+      "elapsed_ms": 152
+    }
+  }
+}

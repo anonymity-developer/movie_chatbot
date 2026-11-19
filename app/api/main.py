@@ -24,6 +24,7 @@ from app.config import ROOT, Settings
 from app.db.collection_cache import CollectionCache
 from app.db.conversations import ConversationRepository
 from app.db.jobs import JobRepository
+from app.api.planner import create_router as create_planner_router
 
 
 app = FastAPI(title="Movie Lab")
@@ -124,6 +125,24 @@ def browser_session(request: Request, response: Response) -> str:
             httponly=True, samesite="lax", secure=request.url.scheme == "https",
         )
     return session_id
+
+
+app.include_router(create_planner_router(browser_session, lambda: settings.cache_db))
+
+
+@app.get("/planner", include_in_schema=False)
+def planner_page():
+    return FileResponse(ROOT / "frontend" / "planner.html")
+
+
+@app.get("/planner.js", include_in_schema=False)
+def planner_script():
+    return FileResponse(ROOT / "frontend" / "planner.js", media_type="application/javascript")
+
+
+@app.get("/planner.css", include_in_schema=False)
+def planner_style():
+    return FileResponse(ROOT / "frontend" / "planner.css", media_type="text/css")
 
 
 def create_qa_graph(*, mode: str = "chat"):
