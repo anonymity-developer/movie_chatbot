@@ -6,7 +6,8 @@ from functools import lru_cache
 import json
 import os
 import re
-from time import time
+from threading import Lock
+from time import monotonic, sleep, time
 from typing import Callable
 
 from pydantic import BaseModel, Field, ValidationError
@@ -15,6 +16,11 @@ import requests
 
 KOBIS = "https://www.kobis.or.kr/kobisopenapi/webservice/rest"
 OVERPASS = "https://overpass-api.de/api/interpreter"
+# Approximate bounding box for the Gangnam Station area (south, west, north, east).
+GANGNAM_STATION_REGIONS = {"강남", "강남역", "서울 강남", "서울 강남역", "서울특별시 강남역"}
+NOMINATIM = "https://nominatim.openstreetmap.org/search"
+_nominatim_lock = Lock()
+_last_nominatim_request = 0.0
 
 
 class CandidateInput(BaseModel):
@@ -139,6 +145,33 @@ def osm_names(region):
 
 @lru_cache(maxsize=128)
 def osm_cinemas(endpoint, region, radius, hour):
+    query = osm_cinema_region_query(region, radius)
+    body = request_json(endpoint, {"data": query}, timeout=(3, 8))
+    if body.get("remark"):
+        raise ToolFailure("SOURCE_UNAVAILABLE", "지도 서비스에서 영화관 조회를 완료하지 못했습니다.")
+    return osm_cinema_items(body["elements"])
+
+
+@lru_cache(maxsize=8)
+def gangnam_cinemas(endpoint, hour):
+    global _last_nominatim_request
+    with _nominatim_lock:
+        sleep(max(0.0, 1.1 - (monotonic() - _last_nominatim_request)))
+        _last_nominatim_request = monotonic()
+        body = request_json(endpoint, {
+            "q": "[cinema] Gangnam-gu, Seoul", "format": "jsonv2", "limit": 5,
+            "countrycodes": "kr", "accept-language": "ko",
+            "viewbox": "127.003,37.520,127.052,37.475", "bounded": 1,
+        }, timeout=(3, 6))
+    return [
+        {"name": row["name"], "address": row.get("display_name") or "",
+         "url": f"https://www.openstreetmap.org/{row['osm_type']}/{int(row['osm_id'])}"}
+        for row in body if row.get("name") and row.get("type") == "cinema"
+        and row.get("osm_type") in {"node", "way", "relation"}
+    ][:5]
+
+
+def osm_cinema_region_query(region, radius):
     bounds = "(33,124,39,132)"
     local_names = osm_names(region)
     stem = region.split()[-1].removesuffix("역")
@@ -151,16 +184,16 @@ def osm_cinemas(endpoint, region, radius, hour):
         for name in (stem, stem + "역")
     )
     area_query = "".join(f'area["boundary"="administrative"]["name"={quoted(name)}];' for name in local_names)
-    query = "[out:json][timeout:8];" + f"({station_query})->.station;({area_query})->.district;" + (
+    return "[out:json][timeout:5];" + f"({station_query})->.station;({area_query})->.district;" + (
         f'(nwr(around.station:{radius})["amenity"="cinema"];'
         f'nwr(area.district)["amenity"="cinema"]{bounds};);out center 15;'
     )
-    body = request_json(endpoint, {"data": query}, timeout=(3, 13))
-    if body.get("remark"):
-        raise ToolFailure("SOURCE_UNAVAILABLE", "지도 서비스에서 영화관 조회를 완료하지 못했습니다.")
+
+
+def osm_cinema_items(elements):
     items = []
     seen = set()
-    for row in body["elements"]:
+    for row in elements:
         tags = row.get("tags", {})
         name = tags.get("name:ko") or tags.get("name")
         if not name or name in seen or row["type"] not in {"node", "way", "relation"}:
@@ -238,7 +271,12 @@ def registry(today: date, demo: bool) -> dict[str, Tool]:
         if not re.fullmatch(r"[가-힣A-Za-z0-9 -]{2,75}", region):
             raise ToolFailure("INVALID_INPUT", "공개 행정구역 또는 역 이름을 입력해 주세요.")
         radius = 2200 if args.query_hint == "영화관" else 3500
-        items = osm_cinemas(os.getenv("PLANNER_OVERPASS_URL", OVERPASS), region, radius, int(time() // 3600))
+        hour = int(time() // 3600)
+        location_search = os.getenv("PLANNER_NOMINATIM_URL", NOMINATIM).strip()
+        if region in GANGNAM_STATION_REGIONS and location_search:
+            items = gangnam_cinemas(location_search, hour)
+        else:
+            items = osm_cinemas(os.getenv("PLANNER_OVERPASS_URL", OVERPASS), region, radius, hour)
         if not items:
             raise ToolFailure("NO_RESULT", "해당 지역의 OpenStreetMap 영화관 검색 결과가 없습니다. 구 또는 역 이름을 확인해 주세요.")
         return {"source": "OpenStreetMap", "items": items}

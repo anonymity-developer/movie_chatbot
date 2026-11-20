@@ -9,9 +9,11 @@
 | GET | `/api/plans` | 입력 없음 → 계획 목록 |
 | POST | `/api/plans` | `{title,date,starts_at,ends_at}` → 201, `{plan,overlaps}` |
 | POST | `/api/plans/{plan_id}/calendar` | 저장한 UUID → 캘린더 등록 결과와 실행 로그. 제목과 시각은 저장소에서 조회 |
+| GET | `/api/calendar/local` | 입력 없음 → 현재 세션의 로컬 일정 목록 |
+| DELETE | `/api/calendar/local/{event_id}` | UUID → 해당 로컬 일정만 삭제, 204 |
 | GET | `/api/plans/{plan_id}` | UUID → 관람 계획 상세 |
 | PUT | `/api/plans/{plan_id}` | UUID와 전체 계획 입력 → `{plan,overlaps}` |
-| DELETE | `/api/plans/{plan_id}` | UUID → 204 |
+| DELETE | `/api/plans/{plan_id}` | UUID → 계획과 연결된 로컬 일정 삭제, 204 |
 | GET | `/api/execution-logs` | 입력 없음 → 실행 ID·시작 시각·이벤트 수 목록 |
 | GET | `/api/execution-logs/{run_id}` | UUID → 순번·시각·이벤트 종류·데이터 배열 |
 | DELETE | `/api/execution-logs/{run_id}` | UUID → 204 |

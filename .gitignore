@@ -1,6 +1,12 @@
 .env
+.env.*
+!.env.example
 .venv/
 .local/
+credentials.json
+token.json
+google-calendar-*.json
 __pycache__/
 *.py[cod]
 docs/
+/AI코어3_agent_서울_13반_백지원.zip

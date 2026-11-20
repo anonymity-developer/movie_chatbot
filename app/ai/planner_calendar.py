@@ -57,7 +57,8 @@ class LocalCalendar:
         ]
 
     def register(self, plan):
-        self.repository.register_calendar_plan(self.session_id, plan)
+        if not self.repository.register_calendar_plan(self.session_id, plan):
+            raise ToolFailure("NOT_FOUND", "저장한 관람 계획을 찾을 수 없습니다.")
         return plan["id"]
 
 

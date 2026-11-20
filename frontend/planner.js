@@ -5,12 +5,26 @@ const chatStatus = document.querySelector('#chat-status');
 const planForm = document.querySelector('#save-plan');
 const planList = document.querySelector('#plan-list');
 const planStatus = document.querySelector('#plan-status');
+const calendarList = document.querySelector('#calendar-list');
+const calendarStatus = document.querySelector('#calendar-status');
+const calendarDays = document.querySelector('#calendar-days');
+const calendarMonthLabel = document.querySelector('#calendar-month');
+const calendarSelection = document.querySelector('#calendar-selection');
+const logs = document.querySelector('#logs');
 const logList = document.querySelector('#log-list');
 const logStatus = document.querySelector('#log-status');
 const logDetail = document.querySelector('#log-detail');
 const save = document.querySelector('#save');
 const cancel = document.querySelector('#cancel');
 let editing = null;
+const seoulDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+function todayKey() {
+  const parts = Object.fromEntries(seoulDate.formatToParts(new Date()).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month.padStart(2, '0')}-${parts.day.padStart(2, '0')}`;
+}
+let selectedDate = todayKey();
+let visibleMonth = selectedDate.slice(0, 7);
+let calendarEntries = [];
 
 const stageLabels = {
   analyze: '요청 분석', plan: 'Tool 계획', execute: 'Tool 실행',
@@ -22,6 +36,10 @@ const toolLabels = {
   rag_search: '작품 근거 검색',
 };
 const reviews = { normal: '이상 없음', abnormal: '이상 징후 발견', undetermined: '판정 불가' };
+const runLabels = {
+  recommended: '추천 완료', no_match: '조건에 맞는 후보 없음', answered: '답변 완료',
+  clarify: '추가 조건 필요', unavailable: '연결 실패',
+};
 
 function node(tag, content, className) {
   const element = document.createElement(tag);
@@ -52,24 +70,75 @@ async function api(path, method = 'GET', data) {
 }
 
 function timeline(events) {
+  const view = node('div', '', 'execution-view');
+  const requests = events.filter(item => item.event === 'tool.request').length;
+  const failures = events.filter(item => item.event === 'tool.response' && !item.data.result.ok).length;
+  const replans = events.filter(item => item.event === 'replan').length;
+  view.append(node('p', `Tool 호출 ${requests}회 · 실패 ${failures}회 · 재계획 ${replans}회`, 'execution-counts'));
   const list = node('ol', '', 'timeline');
   for (const { event, data } of events) {
     let label;
-    if (event === 'stage.enter') label = stageLabels[data.stage];
-    if (event === 'replan') label = `재계획 ${data.attempt}회 · ${data.reason}`;
-    if (event === 'tool.request') label = `${toolLabels[data.tool]} 조회 요청`;
-    if (event === 'tool.response') {
-      const outcome = data.result.ok ? '완료' : data.result.error.message;
-      const movie = data.arguments.movie_id;
-      label = `${toolLabels[data.tool]}${movie ? ` (${movie})` : ''} · ${outcome} · ${data.elapsed_ms}ms`;
+    let description;
+    let tag;
+    let tone;
+    const tool = toolLabels[data.tool] || data.tool;
+    if (event === 'stage.enter' && data.stage !== 'replan') {
+      label = stageLabels[data.stage] || data.stage;
+      tone = 'stage';
     }
-    if (event === 'run.error') label = data.message;
-    if (event === 'worker.decision') label = `Worker ${data.action} · ${data.reason}`;
-    if (event === 'review.result') label = `실행 평가 · ${reviews[data.status]} · 경고 ${data.warnings.length}건`;
-    if (event === 'review.diagnosis') label = `원인 진단 · ${data.summary}`;
-    if (label) list.append(node('li', label, event === 'replan' ? 'replan' : ''));
+    if (event === 'analysis.decision' && data.reason) {
+      label = '요청 분석 근거';
+      description = data.reason;
+    }
+    if (event === 'replan') {
+      label = `재계획 ${data.attempt}회`;
+      description = data.reason;
+      tone = 'replan';
+    }
+    if (event === 'tool.response') {
+      const subject = data.result.data?.title || data.arguments?.region || data.arguments?.movie_id;
+      label = subject ? `${tool} · ${subject}` : tool;
+      tag = `${data.result.ok ? '완료' : '실패'} · ${formatDuration(data.elapsed_ms)}`;
+      tone = data.result.ok ? 'tool-result' : 'failure';
+      description = data.result.error?.message;
+    }
+    if (event === 'constraints.checked') {
+      label = '시간 조건 판정';
+      description = `적합 ${data.matching}편 · 제외 ${data.excluded}편`;
+    }
+    if (event === 'run.error') {
+      label = '실행 오류';
+      description = data.message;
+      tone = 'failure';
+    }
+    if (event === 'worker.decision') {
+      const actions = { retry: '재시도', skip: '건너뜀', replan: '재계획 요청' };
+      label = `${tool} · ${actions[data.action] || data.action}`;
+      description = data.reason;
+    }
+    if (event === 'review.result') {
+      label = '실행 평가';
+      description = `${reviews[data.status] || data.status} · 경고 ${data.warnings.length}건`;
+    }
+    if (event === 'review.diagnosis') {
+      label = '원인 진단';
+      description = data.summary;
+    }
+    if (!label) continue;
+    const entry = node('li', '', tone);
+    const heading = node('div', '', 'timeline-heading');
+    heading.append(node('strong', label));
+    if (tag) heading.append(node('span', tag, 'result-tag'));
+    entry.append(heading);
+    if (description) entry.append(node('p', description));
+    list.append(entry);
   }
-  return list;
+  view.append(list);
+  return view;
+}
+
+function formatDuration(ms) {
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}초`;
 }
 
 function fillPlan(plan) {
@@ -81,12 +150,18 @@ function fillPlan(plan) {
 
 function renderTurn(message, result) {
   const article = node('article', '', 'turn');
-  article.append(node('header', message));
+  const header = node('header', '', 'turn-header');
+  const meta = node('div', '', 'turn-meta');
+  const condition = result.status === 'unavailable' ? 'failure' : '';
+  if (runLabels[result.status]) meta.append(node('span', runLabels[result.status], `result-tag ${condition}`));
   const mode = result.mode === 'demo' ? '데모 데이터 · ' : '';
-  article.append(node('small', `${mode}${(result.elapsed_ms / 1000).toFixed(2)}초`));
+  meta.append(node('small', `${mode}${formatDuration(result.elapsed_ms)}`));
+  header.append(node('h3', message), meta);
+  article.append(header);
   article.append(node('p', result.answer));
+  const movieCards = node('div', '', 'movie-cards');
   for (const movie of result.recommendations) {
-    const item = node('div');
+    const item = node('div', '', 'movie-card');
     item.append(
       node('strong', movie.title),
       node('p', `러닝타임 ${movie.runtime}분 · 늦어도 ${movie.latest_start} 시작${movie.rating ? ` · ${movie.rating}` : ''}`),
@@ -97,8 +172,9 @@ function renderTurn(message, result) {
         planForm.elements.starts_at.focus();
       }),
     );
-    article.append(item);
+    movieCards.append(item);
   }
+  if (movieCards.childElementCount) article.append(movieCards);
   if (result.documents?.length) {
     article.append(node('h3', '근거 문서'));
     const list = node('ul');
@@ -146,8 +222,8 @@ function renderTurn(message, result) {
     link.href = `https://www.openstreetmap.org/search?query=${encodeURIComponent(result.conditions.region + ' 영화관')}`;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    const fallback = node('p');
-    fallback.append(link);
+    const fallback = node('div', '', 'theater-fallback');
+    fallback.append(node('p', '영화관 위치를 가져오지 못했습니다.'), link);
     article.append(fallback);
   }
   if (result.evidence.length || result.excluded.length) {
@@ -184,8 +260,9 @@ chat.addEventListener('submit', async (event) => {
     const result = await api('/api/planner/chat', 'POST', { message });
     renderTurn(message, result);
     if (question.value.trim() === message) question.value = '';
-    chatStatus.textContent = result.errors.map(error => error.message).filter((text, i, items) => items.indexOf(text) === i).join(' ');
+    chatStatus.textContent = '';
     await refreshLogs();
+    if (result.calendar_event?.source === 'local') await refreshCalendar(result.calendar_event.event_id);
   } catch (error) {
     chatStatus.textContent = error.message;
   } finally {
@@ -207,12 +284,12 @@ async function refreshPlans() {
         planForm.elements.title.focus();
       } catch (error) { planStatus.textContent = error.message; }
     }), action('삭제', async () => {
-      if (!window.confirm('이 관람 계획을 삭제할까요?')) return;
+      if (!window.confirm('이 관람 계획과 연결된 로컬 캘린더 일정을 삭제할까요?')) return;
       try {
         await api(`/api/plans/${plan.id}`, 'DELETE');
         if (editing === plan.id) fillPlan({});
         planStatus.textContent = '계획을 삭제했습니다.';
-        await refreshPlans();
+        await Promise.all([refreshPlans(), refreshCalendar()]);
       } catch (error) { planStatus.textContent = error.message; }
     }), action('캘린더 등록', async () => {
       try {
@@ -220,13 +297,93 @@ async function refreshPlans() {
         planStatus.textContent = result.calendar_event
           ? `${result.calendar_event.source === 'google' ? 'Google Calendar' : '로컬 캘린더'}에 등록했습니다.`
           : result.answer;
-        await refreshLogs();
+        await Promise.all([refreshLogs(), refreshCalendar(result.calendar_event?.event_id)]);
       } catch (error) { planStatus.textContent = error.message; }
     }));
     item.append(actions);
     planList.append(item);
   }
 }
+
+function renderCalendar() {
+  const [year, month] = visibleMonth.split('-').map(Number);
+  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+  const dayCount = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const today = todayKey();
+  calendarMonthLabel.textContent = `${year}년 ${month}월`;
+  calendarDays.replaceChildren();
+  for (let blank = 0; blank < firstWeekday; blank++) {
+    const spacer = node('span');
+    spacer.setAttribute('aria-hidden', 'true');
+    calendarDays.append(spacer);
+  }
+  for (let day = 1; day <= dayCount; day++) {
+    const date = `${visibleMonth}-${String(day).padStart(2, '0')}`;
+    const entries = calendarEntries.filter(entry => entry.date === date);
+    const cell = action('', () => {
+      selectedDate = date;
+      calendarStatus.textContent = '';
+      renderCalendar();
+      calendarDays.querySelector('[aria-pressed="true"]').focus();
+    });
+    cell.className = 'calendar-day';
+    cell.setAttribute('aria-label', `${year}년 ${month}월 ${day}일${entries.length ? `, 일정 ${entries.length}건` : ''}`);
+    cell.setAttribute('aria-pressed', String(date === selectedDate));
+    if (date === today) cell.setAttribute('aria-current', 'date');
+    cell.append(node('span', String(day), 'day-number'));
+    if (entries.length) {
+      const label = entries.length === 1 ? entries[0].title : `일정 ${entries.length}건`;
+      cell.append(node('span', label, 'day-event'));
+    }
+    calendarDays.append(cell);
+  }
+  renderCalendarSelection();
+}
+
+function renderCalendarSelection() {
+  const entries = calendarEntries.filter(entry => entry.date === selectedDate);
+  const [year, month, day] = selectedDate.split('-').map(Number);
+  calendarSelection.textContent = `${year}년 ${month}월 ${day}일 일정`;
+  calendarList.replaceChildren();
+  if (!entries.length) calendarList.append(node('li', '이날 등록된 일정이 없습니다.', 'empty-day'));
+  for (const entry of entries) {
+    const item = node('li');
+    const actions = node('div', '', 'actions');
+    actions.append(action('일정 삭제', async () => {
+      if (!window.confirm('이 로컬 캘린더 일정을 삭제할까요? 관람 계획은 유지됩니다.')) return;
+      try {
+        await api(`/api/calendar/local/${entry.id}`, 'DELETE');
+        await refreshCalendar();
+        calendarStatus.textContent = '일정을 삭제했습니다. 새로 검색하면 변경된 일정이 반영됩니다.';
+      } catch (error) { calendarStatus.textContent = error.message; }
+    }));
+    item.append(node('strong', entry.title), node('p', `${entry.starts_at}–${entry.ends_at}`), actions);
+    calendarList.append(item);
+  }
+}
+
+async function refreshCalendar(focusEventId) {
+  calendarEntries = await api('/api/calendar/local');
+  const entry = focusEventId && calendarEntries.find(item => item.id === focusEventId);
+  if (entry) {
+    selectedDate = entry.date;
+    visibleMonth = selectedDate.slice(0, 7);
+  }
+  renderCalendar();
+}
+
+function changeCalendarMonth(offset) {
+  const [year, month] = visibleMonth.split('-').map(Number);
+  const today = todayKey();
+  visibleMonth = offset ? new Date(Date.UTC(year, month - 1 + offset, 1)).toISOString().slice(0, 7) : today.slice(0, 7);
+  selectedDate = visibleMonth === today.slice(0, 7) ? today : `${visibleMonth}-01`;
+  calendarStatus.textContent = '';
+  renderCalendar();
+}
+
+document.querySelector('#calendar-prev').addEventListener('click', () => changeCalendarMonth(-1));
+document.querySelector('#calendar-today').addEventListener('click', () => changeCalendarMonth(0));
+document.querySelector('#calendar-next').addEventListener('click', () => changeCalendarMonth(1));
 
 cancel.addEventListener('click', () => fillPlan({}));
 planForm.addEventListener('submit', async (event) => {
@@ -247,6 +404,7 @@ planForm.addEventListener('submit', async (event) => {
 });
 
 async function refreshLogs() {
+  if (!logs.open) return;
   const runs = await api('/api/execution-logs');
   logList.replaceChildren();
   if (!runs.length) logList.append(node('li', '저장한 실행 기록이 없습니다.'));
@@ -256,7 +414,12 @@ async function refreshLogs() {
     const actions = node('div', '', 'actions');
     actions.append(action('상세', async () => {
       try {
-        logDetail.replaceChildren(timeline(await api(`/api/execution-logs/${run.run_id}`)));
+        const events = await api(`/api/execution-logs/${run.run_id}`);
+        const end = events.find(item => item.event === 'run.end')?.data;
+        const date = new Date(run.started_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+        const title = end && runLabels[end.status] ? runLabels[end.status] : '실행 상세';
+        logDetail.replaceChildren(node('h3', title), node('small', date), timeline(events));
+        logStatus.textContent = '';
       } catch (error) { logStatus.textContent = error.message; }
     }), action('삭제', async () => {
       if (!window.confirm('이 실행 로그를 삭제할까요?')) return;
@@ -271,8 +434,15 @@ async function refreshLogs() {
   }
 }
 
+document.querySelector('nav a[href="#logs"]').addEventListener('click', () => { logs.open = true; });
+logs.addEventListener('toggle', () => {
+  refreshLogs().catch(error => { logStatus.textContent = error.message; });
+});
+
 // Establish the session cookie before the second request.
 refreshPlans()
   .catch(error => { planStatus.textContent = error.message; })
-  .then(refreshLogs)
-  .catch(error => { logStatus.textContent = error.message; });
+  .then(() => Promise.all([
+    refreshLogs().catch(error => { logStatus.textContent = error.message; }),
+    refreshCalendar().catch(error => { calendarStatus.textContent = error.message; }),
+  ]));

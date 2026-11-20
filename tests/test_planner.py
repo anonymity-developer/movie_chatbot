@@ -114,27 +114,32 @@ class PlannerTests(unittest.TestCase):
                   "tools": ["box_office", "theaters", "movie_detail"], "reason": "시간 제약이 있는 요청"}
         responses = [
             {"boxOfficeResult": {"dailyBoxOfficeList": [{"movieCd": "12345678", "movieNm": "예시 영화"}]}},
-            {"elements": [{"type": "node", "id": 123, "tags": {"name": "예시관", "addr:full": "강남"}}]},
+            [{"type": "cinema", "osm_type": "node", "osm_id": 123, "name": "예시관", "display_name": "강남"}],
             {"movieInfoResult": {"movieInfo": {"movieNm": "예시 영화", "showTm": "104"}}},
         ]
-        environment = {"PLANNER_DEMO": "false", "GMS_API_KEY": "gms-example", "GMS_CHAT_MODEL": "example",
-                       "GMS_BASE_URL": "https://example.com/v1", "KOBIS_API_KEY": "kobis-example"}
+        environment = {"PLANNER_DEMO": "false", "GMS_API_KEY": "gms-example",
+                       "GMS_BASE_URL": "https://example.com/v1", "KOBIS_API_KEY": "kobis-example",
+                       "PLANNER_NOMINATIM_URL": "https://example.com/search"}
         with (
             patch.dict(os.environ, environment),
             patch.object(planner_model, "OpenAI") as openai,
             patch("app.ai.planner_tools.requests.get") as request,
         ):
             completion = openai.return_value.__enter__.return_value.chat.completions.create
-            completion.return_value.choices = [Mock(message=Mock(content=json.dumps(answer)))]
+            completion.return_value.choices = [Mock(message=Mock(content=f"```json\n{json.dumps(answer)}\n```"))]
             request.side_effect = [Mock(status_code=200, **{"json.return_value": data}) for data in responses]
             result = self.chat("내일 15:00 이후 강남에서 보고 18:00 전에 끝나는 영화")
+            self.assertEqual(openai.call_args.kwargs["base_url"], "https://gms.ssafy.io/gmsapi/api.anthropic.com/v1")
+            self.assertEqual(openai.call_args.kwargs["default_headers"], {"x-api-key": "gms-example"})
+            self.assertEqual(completion.call_args.kwargs["model"], "claude-haiku-5-5")
+            self.assertNotIn("response_format", completion.call_args.kwargs)
         self.assertEqual(result["mode"], "live")
         self.assertEqual(result["recommendations"][0]["movie_id"], "12345678")
         self.assertEqual([event["data"]["tool"] for event in result["events"] if event["event"] == "tool.request"],
                          ["box_office", "theaters", "movie_detail", "calendar_busy"])
         self.assertEqual(request.call_args_list[2].kwargs["params"]["movieCd"], "12345678")
         self.assertNotIn("Authorization", request.call_args_list[1].kwargs["headers"])
-        self.assertIn('["amenity"="cinema"]', request.call_args_list[1].kwargs["params"]["data"])
+        self.assertEqual(request.call_args_list[1].kwargs["params"]["bounded"], 1)
         self.assertEqual(result["theaters"][0]["url"], "https://www.openstreetmap.org/node/123")
         self.assertNotIn("kobis-example", json.dumps(result))
 
@@ -160,8 +165,17 @@ class PlannerTests(unittest.TestCase):
         result = self.chat("내일 15:00 이후 강남에서 보고 17:00 전에 끝나는 영화")
         self.assertEqual(result["status"], "no_match")
         self.assertTrue(any("연속 시간이 부족" in item["reason"] for item in result["excluded"]))
+        self.assertEqual(self.client.get("/api/calendar/local").json(), [{**plan, "id": plan_id}])
         with TestClient(main.app) as visitor:
             self.assertEqual(visitor.post(path).status_code, 404)
+            self.assertEqual(visitor.get("/api/calendar/local").json(), [])
+            self.assertEqual(visitor.delete(f"/api/calendar/local/{plan_id}").status_code, 404)
+        self.assertEqual(self.client.delete(f"/api/calendar/local/{plan_id}").status_code, 204)
+        self.assertEqual(self.client.get(f"/api/plans/{plan_id}").status_code, 200)
+        self.assertEqual(self.client.post(path).json()["calendar_event"]["event_id"], plan_id)
+        self.assertEqual(self.client.delete(f"/api/plans/{plan_id}").status_code, 204)
+        self.assertEqual(self.client.get("/api/calendar/local").json(), [])
+        self.assertEqual(self.chat("내일 15:00 이후 강남에서 보고 17:00 전에 끝나는 영화")["status"], "recommended")
 
     def test_calendar_google_adapter_contract(self):
         calendar = GoogleCalendar(Path("unused"), "primary")

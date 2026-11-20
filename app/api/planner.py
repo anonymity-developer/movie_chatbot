@@ -69,6 +69,10 @@ class Plan(PlanInput):
     created_at: str
 
 
+class LocalCalendarEntry(PlanInput):
+    id: UUID
+
+
 class PlanWrite(BaseModel):
     plan: Plan
     overlaps: list[Plan]
@@ -177,6 +181,16 @@ def create_router(session_for, settings_for):
     @router.get("/plans", response_model=list[Plan])
     def list_plans(sid: Session, repo: Repository):
         return repo.plans(sid)
+
+    @router.get("/calendar/local", response_model=list[LocalCalendarEntry])
+    def list_local_calendar(sid: Session, repo: Repository):
+        return repo.calendar_entries(sid)
+
+    @router.delete("/calendar/local/{event_id}", status_code=204)
+    def delete_local_calendar_entry(event_id: UUID, sid: Session, repo: Repository):
+        if not repo.delete_calendar_entry(sid, str(event_id)):
+            missing_record()
+        return Response(status_code=204)
 
     @router.get("/plans/{plan_id}", response_model=Plan)
     def detail_plan(plan_id: UUID, sid: Session, repo: Repository):

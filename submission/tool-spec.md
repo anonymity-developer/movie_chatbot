@@ -22,4 +22,5 @@ Tool은 `app/ai/planner_tools.py`에서 설명, 입력·출력 모델, 호출 �
 
 - KOBIS는 영화진흥위원회에서 발급받은 키를 사용한다. 서비스별 호출량과 키의 적용 한도는 키 발급·관리 및 공식 이용 안내에서 확인한다. 서비스는 후보를 집계당 최대 5편 조회하고 같은 실행의 상세 중복을 제거한다. [제공 서비스·약관](https://www.kobis.or.kr/kobisopenapi/homepg/apiservice/searchServiceInfo.do)
 - OpenStreetMap Overpass 공개 인스턴스는 서버에서 공개 행정구역 또는 역 이름을 사용해 `amenity=cinema`를 조회한다. 공개 인스턴스의 부하 제한을 고려해 사용자 요청에서만 검색하고 조회 범위와 응답 수를 제한하며 결과를 캐시한다. 주소가 없는 경우 장소 링크를 제공한다. 데이터 출처 표시와 ODbL 조건을 따른다. [Overpass 사용 안내](https://wiki.openstreetmap.org/wiki/Overpass_API) · [OpenStreetMap 저작권](https://www.openstreetmap.org/copyright)
+- 강남·강남역 요청은 OpenStreetMap Nominatim의 제한된 장소 검색으로 최대 5건을 조회한다. 사용자가 요청할 때만 호출하며, 단일 로컬 서버에서 요청 간격을 1.1초 이상으로 제한하고 결과를 한 시간 단위로 캐시한다. `PLANNER_NOMINATIM_URL`로 검색 주소를 바꾸거나 값을 비워 Overpass만 사용할 수 있다. [Nominatim 사용 정책](https://operations.osmfoundation.org/policies/nominatim/)
 - GMS에서는 교육 계정에 허용된 모델과 사용량을 확인한다. GMS 키는 서버의 환경변수로 제공한다. [SSAFY GMS](https://gms.ssafy.io/web/)

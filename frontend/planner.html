@@ -10,53 +10,71 @@
 <body>
   <header class="masthead">
     <a href="/">← Movie Lab</a>
-    <nav aria-label="플래너 메뉴"><a href="#plans">저장한 계획</a><a href="#logs">실행 로그</a></nav>
+    <nav aria-label="플래너 메뉴"><a href="#plans">저장한 계획</a><a href="#calendar">캘린더</a><a href="#logs">실행 로그</a></nav>
   </header>
   <main>
     <section class="intro" aria-labelledby="title">
       <h1 id="title">관람 플래너</h1>
       <p>볼 수 있는 시간과 지역을 알려 주세요. 조건에 맞는 영화와 주변 영화관을 찾아드려요.</p>
     </section>
-    <div class="workspace">
-      <section class="panel" aria-labelledby="chat-title">
-        <h2 id="chat-title">영화 찾기</h2>
-        <form id="chat">
-          <label for="question">관람 조건</label>
-          <textarea id="question" name="message" required maxlength="2000" rows="3" placeholder="토요일 15:00 이후 강남에서 보고 19:00 전에 끝나는 영화 찾아줘"></textarea>
-          <div class="actions">
-            <button id="send" type="submit">후보 찾기</button>
-            <button id="example" type="button" class="secondary">예시 입력</button>
-          </div>
-        </form>
-        <p id="chat-status" role="status"></p>
-        <div id="conversation"></div>
-      </section>
-      <aside class="sidebar">
-        <section id="plans" class="panel" aria-labelledby="plans-title">
-          <h2 id="plans-title">저장한 계획</h2>
-          <form id="save-plan">
-            <label>영화 <input name="title" required maxlength="200"></label>
-            <label>관람일 <input name="date" type="date" required></label>
-            <div class="time-fields">
-              <label>시작 <input name="starts_at" type="time" required></label>
-              <label>종료 <input name="ends_at" type="time" required></label>
-            </div>
-            <div class="actions">
-              <button id="save" type="submit">계획 저장</button>
-              <button id="cancel" type="button" class="secondary" hidden>수정 취소</button>
-            </div>
-          </form>
-          <p id="plan-status" role="status"></p>
-          <ul id="plan-list" class="records"></ul>
-        </section>
-        <section id="logs" class="panel" aria-labelledby="logs-title">
-          <h2 id="logs-title">실행 로그</h2>
+    <section class="panel" aria-labelledby="chat-title">
+      <h2 id="chat-title">영화 찾기</h2>
+      <form id="chat">
+        <label for="question">관람 조건</label>
+        <textarea id="question" name="message" required maxlength="2000" rows="3" placeholder="토요일 15:00 이후 강남에서 보고 19:00 전에 끝나는 영화 찾아줘"></textarea>
+        <div class="actions">
+          <button id="send" type="submit">후보 찾기</button>
+          <button id="example" type="button" class="secondary">예시 입력</button>
+        </div>
+      </form>
+      <p id="chat-status" role="status"></p>
+      <div id="conversation"></div>
+    </section>
+    <section id="plans" class="panel" aria-labelledby="plans-title">
+      <h2 id="plans-title">저장한 계획</h2>
+      <form id="save-plan">
+        <label>영화 <input name="title" required maxlength="200"></label>
+        <label>관람일 <input name="date" type="date" required></label>
+        <div class="time-fields">
+          <label>시작 <input name="starts_at" type="time" required></label>
+          <label>종료 <input name="ends_at" type="time" required></label>
+        </div>
+        <div class="actions">
+          <button id="save" type="submit">계획 저장</button>
+          <button id="cancel" type="button" class="secondary" hidden>수정 취소</button>
+        </div>
+      </form>
+      <p id="plan-status" role="status"></p>
+      <ul id="plan-list" class="records"></ul>
+    </section>
+    <section id="calendar" class="panel" aria-labelledby="calendar-title">
+      <h2 id="calendar-title">로컬 캘린더</h2>
+      <div class="calendar-toolbar">
+        <h3 id="calendar-month" aria-live="polite"></h3>
+        <div class="actions">
+          <button id="calendar-prev" class="secondary" type="button" aria-label="이전 달">‹</button>
+          <button id="calendar-today" class="secondary" type="button">오늘</button>
+          <button id="calendar-next" class="secondary" type="button" aria-label="다음 달">›</button>
+        </div>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true">
+        <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+      </div>
+      <div id="calendar-days" class="calendar-days" aria-label="날짜 선택"></div>
+      <h3 id="calendar-selection" aria-live="polite"></h3>
+      <p id="calendar-status" role="status"></p>
+      <ul id="calendar-list" class="records" aria-labelledby="calendar-selection"></ul>
+    </section>
+    <details id="logs" class="panel saved-logs">
+      <summary><strong>저장된 실행 로그</strong></summary>
+      <div class="log-content">
+        <div>
           <p id="log-status" role="status"></p>
           <ul id="log-list" class="records"></ul>
-          <div id="log-detail"></div>
-        </section>
-      </aside>
-    </div>
+        </div>
+        <div id="log-detail"></div>
+      </div>
+    </details>
   </main>
 </body>
 </html>

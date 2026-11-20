@@ -76,13 +76,28 @@ class PlannerRepository:
             """, (session_id, day)).fetchall()
         return [dict(row) for row in rows]
 
+    def calendar_entries(self, session_id):
+        with self.connect() as db:
+            rows = db.execute("""
+                SELECT event_id AS id, title, date, starts_at, ends_at FROM planner_calendar
+                WHERE session_id=? ORDER BY date, starts_at, event_id
+            """, (session_id,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def delete_calendar_entry(self, session_id, event_id):
+        with self.connect() as db:
+            return db.execute("DELETE FROM planner_calendar WHERE session_id=? AND event_id=?",
+                              (session_id, event_id)).rowcount
+
     def register_calendar_plan(self, session_id, plan):
         with self.connect() as db:
-            db.execute("""
-                INSERT INTO planner_calendar VALUES (?, ?, ?, ?, ?, ?)
+            return db.execute("""
+                INSERT INTO planner_calendar (session_id, event_id, title, date, starts_at, ends_at)
+                SELECT session_id, id, title, date, starts_at, ends_at FROM planner_plans
+                WHERE session_id=? AND id=?
                 ON CONFLICT(session_id,event_id) DO UPDATE SET title=excluded.title, date=excluded.date,
                     starts_at=excluded.starts_at, ends_at=excluded.ends_at
-            """, (session_id, plan["id"], plan["title"], plan["date"], plan["starts_at"], plan["ends_at"]))
+            """, (session_id, plan["id"])).rowcount
 
     def save_event(self, session_id, run_id, entry):
         with self.connect() as db:
@@ -153,4 +168,7 @@ class PlannerRepository:
 
     def delete_plan(self, session_id, plan_id):
         with self.connect() as db:
-            return db.execute("DELETE FROM planner_plans WHERE session_id=? AND id=?", (session_id, plan_id)).rowcount
+            removed = db.execute("DELETE FROM planner_plans WHERE session_id=? AND id=?", (session_id, plan_id)).rowcount
+            if removed:
+                db.execute("DELETE FROM planner_calendar WHERE session_id=? AND event_id=?", (session_id, plan_id))
+            return removed
